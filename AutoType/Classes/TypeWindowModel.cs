@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
@@ -237,6 +238,38 @@ namespace AutoType.Classes
 
 		#endregion
 
+		#region Prefix
+
+		private string _prefix;
+
+		public string Prefix
+		{
+			get => _prefix;
+			set
+			{
+				var newValue = value.Replace("\\", string.Empty);
+				if (CheckPrefix(newValue))
+				{
+					_prefix = newValue;
+					OnPropertyChanged(nameof(Prefix));
+				}
+			}
+		}
+
+		public bool CheckPrefix(string str)
+		{
+			Regex regex = new Regex(".*[\\<>:\"|?*/]+.*");
+			MatchCollection matches = regex.Matches(str);
+			if (matches.Count >= 1)
+			{
+				MessageBox.Show("Введён один из запрещенных символов: < > : / \" | ? *");
+				return false;
+			}
+			return true;
+		}
+
+		#endregion
+
 		public string[] AllText { get; set; }
 
 		public ConfigurationWindow ConfigurationWindow { get; set; }
@@ -299,7 +332,8 @@ namespace AutoType.Classes
 				{
 					Application.Current.Dispatcher.Invoke(() =>
 					{
-						var path = selectedPath + '\\' + i + ".png";
+
+						var path = selectedPath + '\\' + (string.IsNullOrEmpty(Prefix) ? "" : Prefix + '_') + i + ".png";
 						PngBitmapEncoder png = new();
 						png.Frames.Add(BitmapFrame.Create(image.Source));
 						using (FileStream fs = File.Create(path))
@@ -347,6 +381,12 @@ namespace AutoType.Classes
 					Max = files.Count;
 					//
 					await Task.Run(() => GetImagesFromFiles(files));
+					//
+					if (string.IsNullOrEmpty(Prefix))
+					{
+						string[] fileNames = dialog.SelectedPath.Split('\\');
+						Prefix = fileNames[fileNames.Length - 1];
+					}
 				}
 				catch (Exception e)
 				{
