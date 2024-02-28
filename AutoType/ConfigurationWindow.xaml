@@ -1,0 +1,21 @@
+﻿<Window x:Class="AutoType.ConfigurationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        WindowStartupLocation="CenterScreen" WindowState="Maximized"
+        mc:Ignorable="d"
+        Title="ConfigurationWindow"
+        d:DesignHeight="1080" d:DesignWidth="2310"
+        Icon="../Resources/icon.png">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Dictionaries/ConfigurationFrame.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource ConfigurationFrameTemplate}"/>
+</Window>

@@ -1,0 +1,155 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:configurationFrame="clr-namespace:AutoType.Classes"
+                    x:Class="AutoType.Dictionaries.ConfigurationFrame">
+
+    <DataTemplate x:Key="ConfigurationFrameTemplate" DataType="{x:Type configurationFrame:ConfigurationFrameModel}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <Button ToolTip="Сохранить и выйти?" Width="50" Height="50" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding SaveAndCloseCommand}"
+                    Background="Transparent" BorderBrush="Transparent">
+                <Image Source="../Resources/save.png"/>
+            </Button>
+
+            <Viewbox Grid.Row="1" Width="{Binding ScreenWidth}" Height="{Binding ScreenHeight}">
+                <Grid>
+                    <!--Скриншот для превью-->
+                    <Image Source="{Binding ImageExample}" Height="{Binding ImageExample.Height}" Width="{Binding ImageExample.Width}" 
+                           HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+
+                    <!--Меню-->
+                    <Image Source="../Resources/menu.png" Margin="{Binding MarginForMenu}" Height="1080" Width="2335"
+                        HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                        <Image.RenderTransform>
+                            <ScaleTransform CenterX="1167.5" CenterY="540" ScaleX="{Binding Scale}" ScaleY="{Binding Scale}"/>
+                        </Image.RenderTransform>
+                    </Image>
+
+                    <!--Рамка диалога-->
+                    <Image x:Name="imgFrame" Source="../Resources/frame.png" Margin="{Binding MarginForFrame}" Height="1080" Width="2335"
+                            HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                        <Image.RenderTransform>
+                            <ScaleTransform CenterX="1167.5" CenterY="540" ScaleX="{Binding Scale}" ScaleY="{Binding Scale}"/>
+                        </Image.RenderTransform>
+                    </Image>
+
+
+                    <!--Рамка места-->
+                    <Image Name="imgRamka" Source="../Resources/ramka.png" Margin="{Binding MarginForFrame}" Height="1080" Width="2335"
+                        Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Image.RenderTransform>
+                            <ScaleTransform CenterX="1167.5" CenterY="540" ScaleX="{Binding Scale}" ScaleY="{Binding Scale}"/>
+                        </Image.RenderTransform>
+                    </Image>
+                </Grid>
+            </Viewbox>
+
+            <Grid HorizontalAlignment="Center" Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Name="textFrame" Text="Рамка" FontSize="20" Margin="5 5 5 20" Foreground="Red"/>
+                <StackPanel Orientation="Vertical" Grid.Row="1">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Влево-Вправо" FontSize="20" Margin="5" VerticalAlignment="Top"/>
+                        <Slider Name="sliderLrFrame" Minimum="-500" Maximum="500" TickPlacement="BottomRight" Value="{Binding ValueLrFrame, UpdateSourceTrigger=PropertyChanged}"
+                            Width="400" Height="50" Grid.Column="1"/>
+                        <TextBox Text="{Binding ElementName=sliderLrFrame, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Width="50" FontSize="20" Grid.Column="2"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Вниз-Вверх" FontSize="20" Margin="5" VerticalAlignment="Top"/>
+                        <Slider Name="sliderTbFrame" Minimum="-500" Maximum="500" TickPlacement="BottomRight" Value="{Binding ValueTbFrame, UpdateSourceTrigger=PropertyChanged}"
+                            Width="400" Height="50" Grid.Column="1"/>
+                        <TextBox Text="{Binding ElementName=sliderTbFrame, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Width="50" FontSize="20" Grid.Column="2"/>
+                    </Grid>
+                </StackPanel>
+                <TextBlock Name="textMenu" Text="Меню" FontSize="20" Margin="5 5 5 20" Grid.Column="2" Foreground="Red"/>
+                <StackPanel Name="stackPanelMenu" Orientation="Vertical" Grid.Row="1" Grid.Column="2">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Влево-Вправо" FontSize="20" Margin="5" VerticalAlignment="Top"/>
+                        <Slider Name="sliderLrMenu" Minimum="-500" Maximum="500" TickPlacement="BottomRight" Value="{Binding ValueLrMenu, UpdateSourceTrigger=PropertyChanged}"
+                            Width="400" Height="50" Grid.Column="1"/>
+                        <TextBox Text="{Binding ElementName=sliderLrMenu, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Width="50" FontSize="20" Grid.Column="2"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Вниз-Вверх" FontSize="20" Margin="5" VerticalAlignment="Top"/>
+                        <Slider Name="sliderTbMenu" Minimum="-500" Maximum="500" TickPlacement="BottomRight" Value="{Binding ValueTbMenu, UpdateSourceTrigger=PropertyChanged}"
+                            Width="400" Height="50" Grid.Column="1"/>
+                        <TextBox Text="{Binding ElementName=sliderTbMenu, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Width="50" FontSize="20" Grid.Column="2"/>
+                    </Grid>
+                </StackPanel>
+                <TextBlock Name="textScale" Text="Масштаб" FontSize="20" Margin="5 5 5 20" Foreground="Red" Grid.Row="2"/>
+                <Grid Name="gridScale" Grid.Row="3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="170"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Меньше-Больше" FontSize="20" Margin="5" VerticalAlignment="Top"/>
+                    <Slider Name="sliderScale" Minimum="0" Maximum="2" TickPlacement="BottomRight" Value="{Binding Scale, UpdateSourceTrigger=PropertyChanged}"
+                        Width="400" Height="50" Grid.Column="1"/>
+                    <TextBox Text="{Binding ElementName=sliderScale, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Width="50" FontSize="20" Grid.Column="2"/>
+                </Grid>
+                <TextBlock Name="textOpacity" Text="Прозрачность" FontSize="20" Margin="5 5 5 20" Foreground="Red" Grid.Row="4"/>
+                <Grid Name="gridOpacity" Grid.Row="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="170"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Меньше-Больше" FontSize="20" Margin="5" VerticalAlignment="Top"/>
+                    <Slider Name="sliderOpacity" Minimum="0" Maximum="1" TickPlacement="BottomRight" Value="{Binding ElementName=imgFrame, Path=Opacity, UpdateSourceTrigger=PropertyChanged}"
+                        Width="400" Height="50" Grid.Column="1"/>
+                    <TextBox Text="{Binding ElementName=sliderOpacity, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Width="50" FontSize="20" Grid.Column="2"/>
+                </Grid>
+            </Grid>
+        </Grid>
+        <DataTemplate.Triggers>
+            <DataTrigger Binding="{Binding FileType}" Value="{x:Static configurationFrame:FileTypes.Place}">
+                <Setter TargetName="imgFrame" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="textMenu" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="stackPanelMenu" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="imgRamka" Property="Visibility" Value="Visible"/>
+
+                <Setter TargetName="gridScale" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="textScale" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="sliderOpacity" Property="Value" Value="{Binding ElementName=imgRamka, Path=Opacity, UpdateSourceTrigger=PropertyChanged}"/>
+            </DataTrigger>
+        </DataTemplate.Triggers>
+    </DataTemplate>
+</ResourceDictionary>

@@ -1,0 +1,60 @@
+﻿using System;
+using System.ComponentModel;
+using System.IO;
+using System.IO.Packaging;
+using System.IO.Pipes;
+using System.Net;
+using System.Net.Http;
+using System.Reflection;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Shapes;
+using System.Windows.Xps.Packaging;
+
+namespace AutoType
+{
+	/// <summary>
+	/// Логика взаимодействия для GuideWindow.xaml
+	/// </summary>
+	public partial class GuideWindow : Window
+	{
+		public GuideWindow()
+		{
+			InitializeComponent();
+		}
+
+		private readonly string Path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\AutoType\\guide.xps";
+
+		public void GetGuide()
+		{
+			string url = "https://drive.google.com/uc?export=download&id=1v8R-pdOtLQ19eG3doc9XVjJlsZxpElKd";
+			if (!File.Exists(Path))
+				try
+				{
+					using (WebClient client = new())
+					{
+						client.DownloadFileCompleted += client_DownloadFileCompleted;
+						client.DownloadFileTaskAsync(url, Path);
+					}
+				}
+				catch (Exception e)
+				{
+					MessageBox.Show(e.Message);
+				}
+			else 
+				LoadDocument();
+		}
+
+		public void client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+		{
+			if (!e.Cancelled && e.Error == null)
+				LoadDocument();
+		}
+
+		public void LoadDocument()
+		{
+			XpsDocument doc = new(Path, FileAccess.Read);
+			documentViewer.Document = doc.GetFixedDocumentSequence();
+		}
+	}
+}

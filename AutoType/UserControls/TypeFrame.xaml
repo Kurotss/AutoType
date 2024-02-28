@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="AutoType.UserControls.TypeFrame"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:classes="clr-namespace:AutoType.Classes"
+             mc:Ignorable="d">
+
+    <Grid>
+        <Image Name="screen" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        <Grid Name="gridOld" Visibility="Collapsed">
+            <Image Name="imgMenu" Source="../Resources/menu.png" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="2335" Height="1080"/>
+            <Grid Name="gridFrame" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                <Image Source="../Resources/frame.png" Width="2335" Height="1080" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
+                <TextBlock Name="txtName" Foreground="White" FontSize="53" Height="60" Width="550"
+                   HorizontalAlignment="Center" VerticalAlignment="Bottom" FontFamily="../Resources/#Etelka Pro" Margin="0 0 780 273" />
+                <TextBox Name="txtDescr" Foreground="#454257" FontSize="32.5pt" Height="200" Width="1400" Background="Transparent" BorderThickness="0" AcceptsReturn="True"
+                   HorizontalAlignment="Center" VerticalAlignment="Bottom" FontFamily="../Resources/#Etelka Pro" Margin="-30 0 0 50" TextWrapping="Wrap"/>
+            </Grid>
+        </Grid>
+        <Grid Name="gridNew" Visibility="Collapsed">
+            <Image Name="imgFrameNew" Source="../Resources/frame_new.png" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="2280" Height="1080"/>
+            <classes:OutlinedTextBlock x:Name="txtNameNew" Fill="White" FontSize="42.5pt" Width="565" Margin="0 0 1065.5 315.5" 
+                FontFamily="../Resources/#Etelka Pro" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Left"
+                FontWeight="ExtraBold" StrokeThickness="7" Stroke="#44446a" StrokePosition="Outside" xml:space="preserve"/>
+            <TextBox Name="txtDescrNew" Foreground="#44446a" FontSize="31.5pt" Height="250" Width="1565" Background="Transparent" BorderThickness="0" AcceptsReturn="True"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom" FontFamily="../Resources/#Etelka Pro" Margin="0 0 88 21" TextWrapping="Wrap"/>
+        </Grid>
+    </Grid>
+</UserControl>

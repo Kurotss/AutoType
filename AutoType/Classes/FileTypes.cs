@@ -1,0 +1,10 @@
+﻿namespace AutoType.Classes
+{
+	public enum FileTypes
+	{
+		None = 1, // не нужно ничего накладывать
+		Menu = 2, // только меню наложить
+		Place = 3, // рамка места
+		Dialog = 4 // реплика
+	}
+}
