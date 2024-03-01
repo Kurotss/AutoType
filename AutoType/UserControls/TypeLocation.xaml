@@ -15,13 +15,13 @@
             <Image Name="imgMenu" Source="../Resources/menu.png" Width="2335" Height="1080" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
             <Grid Name="gridPlace"  HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Image Source="../Resources/ramka.png" Width="2335" Height="1080" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Name="txtPlace" FontFamily="../Resources/#Etelka Pro" Foreground="White" FontSize="40" TextWrapping="Wrap" AcceptsReturn="True"
+                <TextBox Name="txtPlace" FontFamily="../Resources/#Casper Bold" Foreground="White" FontSize="44" TextWrapping="Wrap" AcceptsReturn="True"
                        VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Width="804" Background="Transparent" BorderThickness="0"/>
             </Grid>
         </Grid>
         <Grid Name="gridNew" Visibility="Collapsed">
             <Image Name="imgPlaceNew" Source="../Resources/place_new.png" Width="2280" Height="1080" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-            <TextBox Name="txtPlaceNew" FontFamily="../Resources/#Etelka Pro" Foreground="White" FontSize="35" TextWrapping="Wrap" AcceptsReturn="True"
+            <TextBox Name="txtPlaceNew" FontFamily="../Resources/#Casper Bold" Foreground="White" FontSize="35" TextWrapping="Wrap" AcceptsReturn="True"
                        VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Width="700" Background="Transparent" BorderThickness="0"/>
         </Grid>
     </Grid>

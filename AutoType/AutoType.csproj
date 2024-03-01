@@ -11,6 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\casper.otf" />
     <None Remove="Resources\delete.png" />
     <None Remove="Resources\etelka.ttf" />
     <None Remove="Resources\frame.png" />
@@ -49,6 +50,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\casper.otf" />
     <Resource Include="Resources\delete.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
