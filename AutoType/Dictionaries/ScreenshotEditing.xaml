@@ -99,7 +99,7 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid Visibility="{Binding Source, Converter={StaticResource ObjectToVisibilityConverter}}">
-                            <Image Source="{Binding Source}" Width="{Binding WidthForPreview}" Height="{Binding HeightForPreview}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Image Source="{Binding Source}" Width="{Binding WidthForPreview}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             <Button Command="{Binding OpenControlCommand}" Background="Transparent" Style="{StaticResource listBoxItemButtonStyle}"/>
                         </Grid>
                     </DataTemplate>

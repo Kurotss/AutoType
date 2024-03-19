@@ -22,7 +22,7 @@ namespace AutoType.Classes
 				_source = value;
 				OnPropertyChanged(nameof(Source));
 				OnPropertyChanged(nameof(WidthForPreview));
-				OnPropertyChanged(nameof(HeightForPreview));
+				//OnPropertyChanged(nameof(HeightForPreview));
 				OnPropertyChanged(nameof(IsNotNullSource));
 			}
 		}
@@ -35,12 +35,12 @@ namespace AutoType.Classes
 		/// <summary>
 		/// Ширина картинки для превью в списке
 		/// </summary>
-		public double? WidthForPreview => Source?.Width / 4;
+		public double? WidthForPreview => SystemParameters.PrimaryScreenWidth / 3.2;
 
 		/// <summary>
 		/// Ширина картинки для превью в списке
 		/// </summary>
-		public double? HeightForPreview => Source?.Height / 4;
+		//public double? HeightForPreview => Source?.Height / 4;
 
 		/// <summary>
 		/// Заполнен ли Dource
