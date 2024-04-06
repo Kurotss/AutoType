@@ -17,14 +17,14 @@
             </Button>
 
             <Viewbox Grid.Row="1" Width="{Binding ScreenWidth}" Height="{Binding ScreenHeight}">
-                <Grid>
+                <Grid Height="{Binding ImageExample.Height}" Width="{Binding ImageExample.Width}" >
                     <!--Скриншот для превью-->
                     <Image Source="{Binding ImageExample}" Height="{Binding ImageExample.Height}" Width="{Binding ImageExample.Width}" 
                            HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
 
                     <!--Меню-->
                     <Image Source="../Resources/menu.png" Margin="{Binding MarginForMenu}" Height="1080" Width="2335"
-                        HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                           HorizontalAlignment="Center" VerticalAlignment="Bottom">
                         <Image.RenderTransform>
                             <ScaleTransform CenterX="1167.5" CenterY="540" ScaleX="{Binding Scale}" ScaleY="{Binding Scale}"/>
                         </Image.RenderTransform>
@@ -32,7 +32,15 @@
 
                     <!--Рамка диалога-->
                     <Image x:Name="imgFrame" Source="../Resources/frame.png" Margin="{Binding MarginForFrame}" Height="1080" Width="2335"
-                            HorizontalAlignment="Center" VerticalAlignment="Bottom">
+                           HorizontalAlignment="Center" VerticalAlignment="Bottom" Visibility="Collapsed">
+                        <Image.RenderTransform>
+                            <ScaleTransform CenterX="1167.5" CenterY="540" ScaleX="{Binding Scale}" ScaleY="{Binding Scale}"/>
+                        </Image.RenderTransform>
+                    </Image>
+
+                    <!--Левая рамка-->
+                    <Image Name="imgLeftPlace" Source="../Resources/left_place.png" Margin="{Binding MarginForLeftPlace}" Height="1080" Width="2335"
+                           HorizontalAlignment="Center" VerticalAlignment="Bottom" Visibility="Collapsed">
                         <Image.RenderTransform>
                             <ScaleTransform CenterX="1167.5" CenterY="540" ScaleX="{Binding Scale}" ScaleY="{Binding Scale}"/>
                         </Image.RenderTransform>
@@ -64,7 +72,7 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Name="textFrame" Text="Рамка" FontSize="20" Margin="5 5 5 20" Foreground="Red"/>
-                <StackPanel Orientation="Vertical" Grid.Row="1">
+                <StackPanel Name="stackPanelFrame" Orientation="Vertical" Grid.Row="1">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="170"/>
@@ -114,19 +122,21 @@
                     </Grid>
                 </StackPanel>
                 <TextBlock Name="textScale" Text="Масштаб" FontSize="20" Margin="5 5 5 20" Foreground="Red" Grid.Row="2"/>
-                <Grid Name="gridScale" Grid.Row="3">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="170"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Меньше-Больше" FontSize="20" Margin="5" VerticalAlignment="Top"/>
-                    <Slider Name="sliderScale" Minimum="0" Maximum="2" TickPlacement="BottomRight" Value="{Binding Scale, UpdateSourceTrigger=PropertyChanged}"
+                <StackPanel Grid.Row="3">
+                    <Grid Name="gridScale" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Меньше-Больше" FontSize="20" Margin="5" VerticalAlignment="Top"/>
+                        <Slider Name="sliderScale" Minimum="0" Maximum="2" TickPlacement="BottomRight" Value="{Binding Scale, UpdateSourceTrigger=PropertyChanged}"
                         Width="400" Height="50" Grid.Column="1"/>
-                    <TextBox Text="{Binding ElementName=sliderScale, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Width="50" FontSize="20" Grid.Column="2"/>
-                </Grid>
-                <TextBlock Name="textOpacity" Text="Прозрачность" FontSize="20" Margin="5 5 5 20" Foreground="Red" Grid.Row="4"/>
-                <Grid Name="gridOpacity" Grid.Row="5">
+                        <TextBox Text="{Binding ElementName=sliderScale, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Width="50" FontSize="20" Grid.Column="2"/>
+                    </Grid>
+                    <TextBlock Name="textOpacity" Text="Прозрачность" FontSize="20" Margin="5 5 5 20" Foreground="Red" Grid.Row="4"/>
+                </StackPanel>
+                <Grid Name="gridOpacity" Grid.Row="4">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="170"/>
                         <ColumnDefinition Width="Auto"/>
@@ -134,14 +144,38 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Меньше-Больше" FontSize="20" Margin="5" VerticalAlignment="Top"/>
                     <Slider Name="sliderOpacity" Minimum="0" Maximum="1" TickPlacement="BottomRight" Value="{Binding ElementName=imgFrame, Path=Opacity, UpdateSourceTrigger=PropertyChanged}"
-                        Width="400" Height="50" Grid.Column="1"/>
+                    Width="400" Height="50" Grid.Column="1"/>
                     <TextBox Text="{Binding ElementName=sliderOpacity, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Width="50" FontSize="20" Grid.Column="2"/>
                 </Grid>
+                <TextBlock Name="textLeftPlace" Text="Рамка слева" FontSize="20" Margin="5 5 5 20" Foreground="Red" Grid.Row="2" Grid.Column="2" Visibility="Collapsed"/>
+                <StackPanel Name="stackPanelLeftPlace" Orientation="Vertical" Grid.Row="3" Grid.Column="2" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Влево-Вправо" FontSize="20" Margin="5" VerticalAlignment="Top"/>
+                        <Slider Name="sliderLrLeftPlace" Minimum="-500" Maximum="500" TickPlacement="BottomRight" Value="{Binding ValueLrLeftPlace, UpdateSourceTrigger=PropertyChanged}"
+                            Width="400" Height="50" Grid.Column="1"/>
+                        <TextBox Text="{Binding ElementName=sliderLrLeftPlace, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Width="50" FontSize="20" Grid.Column="2"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="170"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="Вниз-Вверх" FontSize="20" Margin="5" VerticalAlignment="Top"/>
+                        <Slider Name="sliderTbLeftPlace" Minimum="-500" Maximum="500" TickPlacement="BottomRight" Value="{Binding ValueTbLeftPlace, UpdateSourceTrigger=PropertyChanged}"
+                            Width="400" Height="50" Grid.Column="1"/>
+                        <TextBox Text="{Binding ElementName=sliderTbLeftPlace, Path=Value, UpdateSourceTrigger=PropertyChanged}" TextAlignment="Center" Width="50" FontSize="20" Grid.Column="2"/>
+                    </Grid>
+                </StackPanel>
             </Grid>
         </Grid>
         <DataTemplate.Triggers>
             <DataTrigger Binding="{Binding FileType}" Value="{x:Static configurationFrame:FileTypes.Place}">
-                <Setter TargetName="imgFrame" Property="Visibility" Value="Collapsed"/>
                 <Setter TargetName="textMenu" Property="Visibility" Value="Collapsed"/>
                 <Setter TargetName="stackPanelMenu" Property="Visibility" Value="Collapsed"/>
                 <Setter TargetName="imgRamka" Property="Visibility" Value="Visible"/>
@@ -149,6 +183,29 @@
                 <Setter TargetName="gridScale" Property="Visibility" Value="Collapsed"/>
                 <Setter TargetName="textScale" Property="Visibility" Value="Collapsed"/>
                 <Setter TargetName="sliderOpacity" Property="Value" Value="{Binding ElementName=imgRamka, Path=Opacity, UpdateSourceTrigger=PropertyChanged}"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding FileType}" Value="{x:Static configurationFrame:FileTypes.Dialog}">
+                <Setter TargetName="imgFrame" Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding FileType}" Value="{x:Static configurationFrame:FileTypes.Left}">
+                <Setter TargetName="imgLeftPlace" Property="Visibility" Value="Visible"/>
+                <Setter TargetName="textLeftPlace" Property="Visibility" Value="Visible"/>
+                <Setter TargetName="stackPanelLeftPlace" Property="Visibility" Value="Visible"/>
+
+                <Setter TargetName="gridScale" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="textScale" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="stackPanelFrame" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="textFrame" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="textMenu" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="stackPanelMenu" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="textOpacity" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="gridOpacity" Property="Visibility" Value="Collapsed"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding FileType}" Value="{x:Static configurationFrame:FileTypes.LeftAndDialog}">
+                <Setter TargetName="imgLeftPlace" Property="Visibility" Value="Visible"/>
+                <Setter TargetName="imgFrame" Property="Visibility" Value="Visible"/>
+                <Setter TargetName="textLeftPlace" Property="Visibility" Value="Visible"/>
+                <Setter TargetName="stackPanelLeftPlace" Property="Visibility" Value="Visible"/>
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>

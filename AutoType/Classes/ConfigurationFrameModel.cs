@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Word;
+using System;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -6,9 +7,14 @@ namespace AutoType.Classes
 {
 	public class ConfigurationFrameModel : BaseDataContext
 	{
-		public ConfigurationFrameModel(FileTypes fileType, BitmapSource image, Configuration? config)
+		public ConfigurationFrameModel(FileTypes fileType, BitmapSource image, Configuration? config, double? croppedWidth, double? croppedHeight)
 		{
-			_imageExample = image;
+			if (image.Width - croppedWidth < 0 || image.Height - croppedHeight < 0)
+				throw new ArgumentException("Параметры для обрезки не должны быть больше исходных размеров картинок.");
+			if (croppedWidth == null || croppedHeight == null)
+				ImageExample = image;
+			else
+				ImageExample = new CroppedBitmap(image, new Int32Rect((int)(image.Width - croppedWidth) / 2, (int)(image.Height - croppedHeight) / 2, (int)croppedWidth, (int)croppedHeight));
 			FileType = fileType;
 			Config = config;
 			if (config != null)
@@ -36,9 +42,7 @@ namespace AutoType.Classes
 		/// <summary>
 		/// Картинка, по образцу которой делается настройка
 		/// </summary>
-		private BitmapSource _imageExample;
-
-		public BitmapSource ImageExample => _imageExample;
+		public BitmapSource ImageExample { get; set; }
 
 		#endregion
 
@@ -160,6 +164,63 @@ namespace AutoType.Classes
 
 		#endregion
 
+		#region MarginForLeftPlace
+
+		#region ValueLrLeftPlace
+
+		private int _valueLrLeftPlace;
+
+		/// <summary>
+		/// Левый и правый отступ для левой рамки места
+		/// </summary>
+		public int ValueLrLeftPlace
+		{
+			get => _valueLrLeftPlace;
+			set
+			{
+				_valueLrLeftPlace = value;
+				OnPropertyChanged(nameof(MarginForLeftPlace));
+			}
+		}
+
+		#endregion
+
+		#region ValueTbLeftPlace
+
+		private int _valueTbLeftPlace;
+
+		/// <summary>
+		/// Верхний и нижний отступ для левой рамки места
+		/// </summary>
+		public int ValueTbLeftPlace
+		{
+			get => _valueTbLeftPlace;
+			set
+			{
+				_valueTbLeftPlace = value;
+				OnPropertyChanged(nameof(MarginForLeftPlace));
+			}
+		}
+
+		#endregion
+
+		/// <summary>
+		/// Значения для настройки местоположения левой рамки места
+		/// </summary>
+		public Thickness MarginForLeftPlace
+		{
+			get
+			{
+				int valueL = 0;
+				int valueR = -ValueLrLeftPlace;
+				int valueT = 0;
+				int valueB = ValueTbLeftPlace;
+				return new Thickness(valueL, valueT, valueR, valueB);
+			}
+		}
+
+		#endregion
+
 		#region Scale
 
 		private double _scale = 1;
@@ -245,6 +306,20 @@ namespace AutoType.Classes
 						MarginForMenu = new Thickness(MarginForMenu.Left, MarginForMenu.Top, MarginForMenu.Right, MarginForMenu.Bottom),
 						Scale = Scale
 					};
+				case FileTypes.LeftAndDialog:
+					return new Configuration()
+					{
+						ConfigurationName = Math.Round(ImageExample.Width).ToString() + " x " + Math.Round(ImageExample.Height).ToString(),
+						MarginForDialog = new Thickness(MarginForFrame.Left, MarginForFrame.Top, MarginForFrame.Right, MarginForFrame.Bottom),
+						MarginForMenu = new Thickness(MarginForMenu.Left, MarginForMenu.Top, MarginForMenu.Right, MarginForMenu.Bottom),
+						MarginForLeftPlace = new Thickness(MarginForLeftPlace.Left, MarginForLeftPlace.Top, MarginForLeftPlace.Right, MarginForLeftPlace.Bottom),
+						Scale = Scale
+					};
+				case FileTypes.Left:
+					{
+						Config.MarginForLeftPlace = new Thickness(MarginForLeftPlace.Left, MarginForLeftPlace.Top, MarginForLeftPlace.Right, MarginForLeftPlace.Bottom);
+						return Config;
+					}
 				case FileTypes.Place:
 					Config.MarginForPlace = new Thickness(MarginForFrame.Left, MarginForFrame.Top, MarginForFrame.Right, MarginForFrame.Bottom);
 					return Config;

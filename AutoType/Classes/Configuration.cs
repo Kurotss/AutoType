@@ -9,6 +9,7 @@ namespace AutoType.Classes
 		public Thickness MarginForPlace { get; set; }
 
 		public Thickness MarginForMenu { get; set; }
+		public Thickness MarginForLeftPlace { get; set; }
 
 		/// <summary>
 		/// Масштаб для всего

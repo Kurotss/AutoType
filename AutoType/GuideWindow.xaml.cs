@@ -28,7 +28,6 @@ namespace AutoType
 		public void GetGuide()
 		{
 			string url = "https://drive.google.com/uc?export=download&id=1v8R-pdOtLQ19eG3doc9XVjJlsZxpElKd";
-			if (!File.Exists(Path))
 				try
 				{
 					using (WebClient client = new())
@@ -41,14 +40,13 @@ namespace AutoType
 				{
 					MessageBox.Show(e.Message);
 				}
-			else 
-				LoadDocument();
 		}
 
 		public void client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
 		{
 			if (!e.Cancelled && e.Error == null)
 				LoadDocument();
+			else MessageBox.Show($"{e.Error}");
 		}
 
 		public void LoadDocument()

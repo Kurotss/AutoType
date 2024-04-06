@@ -15,6 +15,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
@@ -270,6 +271,55 @@ namespace AutoType.Classes
 
 		#endregion
 
+		#region CroppedSizes
+
+		#region CroppedWidth
+
+		private double? _croppedWidth;
+
+		/// <summary>
+		/// Ширина для обрезки скринов
+		/// </summary>
+		public double? CroppedWidth
+		{
+			get => _croppedWidth;
+			set
+			{
+				if (value <= 0)
+					MessageBox.Show("Такое значение недопустимо.");
+				else
+				{
+					_croppedWidth = value;
+					OnPropertyChanged(nameof(CroppedWidth));
+				}
+			}
+		}
+
+		#endregion
+
+		#region CroppedHeight
+
+		private double? _croppedHeight;
+
+		public double? CroppedHeight
+		{
+			get => _croppedHeight;
+			set
+			{
+				if (value <= 0)
+					MessageBox.Show("Такое значение недопустимо.");
+				else
+				{
+					_croppedHeight = value;
+					OnPropertyChanged(nameof(CroppedHeight));
+				}
+			}
+		}
+
+		#endregion
+
+		#endregion
+
 		public string[] AllText { get; set; }
 
 		public ConfigurationWindow ConfigurationWindow { get; set; }
@@ -425,6 +475,10 @@ namespace AutoType.Classes
 							fileType = FileTypes.Menu;
 						else if (fileName.Contains("place"))
 							fileType = FileTypes.Place;
+						else if (fileName.Contains("left_and_dialog"))
+							fileType = FileTypes.LeftAndDialog;
+						else if (fileName.Contains("left"))
+							fileType = FileTypes.Left;
 						// создаём объект, где будут храниться данные по одному скриншоту: контроль для редактирования, результат режим и т.д.
 						var item = new TypeScreen()
 						{
@@ -525,10 +579,22 @@ namespace AutoType.Classes
 			}
 			// Проверка на равное количество строк текста и скриншотов с текстом
 			int stringCnt = AllText.Where(item => !string.IsNullOrEmpty(item)).Count();
-			int filesCnt = Images.Where(item => item.Type == FileTypes.Place || (item.Type != FileTypes.Menu && item.Type != FileTypes.None)).Count();
+			int filesCnt = Images.Where(item => item.Type == FileTypes.Place || item.Type == FileTypes.Dialog || item.Type == FileTypes.Left).Count();
+			filesCnt += Images.Where(item => item.Type == FileTypes.LeftAndDialog).Count() * 2;
 			if (stringCnt != filesCnt)
 			{
 				MessageBox.Show($"Количество скриншотов ({filesCnt}) не соотвествует количеству строк текста ({stringCnt}). Проверьте и выберите папку со скриншотами или файл с текстом заново.");
+				return false;
+			}
+			var img = Images.FirstOrDefault();
+			if (FrameMode == FrameMode.Old && (img?.FileSource.Width - CroppedWidth < 0 || img?.FileSource.Height - CroppedHeight < 0))
+			{
+				MessageBox.Show("Параметры для обрезки не должны быть больше исходных размеров картинок.");
+				return false;
+			}
+			if (FrameMode == FrameMode.Old && (CroppedWidth != null && CroppedHeight == null || CroppedWidth == null && CroppedHeight != null))
+			{
+				MessageBox.Show("Укажите все параметры для обрезки.");
 				return false;
 			}
 			return true;
@@ -559,6 +625,30 @@ namespace AutoType.Classes
 			}
 		}
 
+		// прогон пустых строк до следующей строки с текстом
+		public string GetLine(ref int i)
+		{
+			// переменная с текстом для скриншота
+			string line;
+			do
+			{
+				line = AllText[i];
+				i++;
+			}
+			while (string.IsNullOrEmpty(line));
+			return line;
+		}
+
+		public static string[] GetDialog(string line, int i)
+		{
+			// делим строку на имя и реплику. если в реплике было :, то склеиваем реплику
+			string[] lines = line.Split(':');
+			if (lines.Length > 2)
+				for (int j = 2; j < lines.Length; j++)
+					lines[1] += ':' + lines[j];
+			return lines;
+		}
+
 		/// <summary>
 		/// Получение всех строк с переводом из документа и цикл с перебором всех скриншотов
 		/// </summary>
@@ -577,56 +667,65 @@ namespace AutoType.Classes
 							// переменная с текстом для скриншота
 							string line = string.Empty;
 							// пропускаем пустые строки и ищем следующую строку с текстом
-							if (typeScreen.Type == FileTypes.Place || typeScreen.Type == FileTypes.Dialog)
+							if (typeScreen.Type == FileTypes.Place || typeScreen.Type == FileTypes.Dialog || typeScreen.Type == FileTypes.Left || typeScreen.Type == FileTypes.LeftAndDialog)
 							{
-								do
-								{
-									line = AllText[i];
-									i++;
-								}
-								while (string.IsNullOrEmpty(line));
+								line = GetLine(ref i);
 							}
 							//
 							switch (typeScreen.Type)
 							{
 								case FileTypes.Menu:
 									{
-										typeScreen.UserControl = new TypeLocation("", false, CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource);
+										typeScreen.UserControl = new TypeLocation(string.Empty, false, CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource, CroppedWidth, CroppedHeight);
 										break;
 									}
 								case FileTypes.Place:
 									{
-										typeScreen.UserControl = new TypeLocation(line, true, CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource);
+										typeScreen.UserControl = new TypeLocation(line, true, CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource, CroppedWidth, CroppedHeight);
 										break;
 									}
-								case FileTypes.None:
-									break;
-								default:
+								case FileTypes.Left:
 									{
-										// делим строку на имя и реплику. если в реплике было :, то склеиваем реплику
-										string[] lines = line.Split(':');
-										if (lines.Length > 2)
-											for (int j = 2; j < lines.Length; j++)
-												lines[1] += ':' + lines[j];
-										try
-										{
-											typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource);
-										}
-										catch
+										typeScreen.UserControl = new TypeFrame(string.Empty, string.Empty, CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource, CroppedWidth, CroppedHeight, false, true,
+											line.Split("|"));
+										break;
+									}
+								case FileTypes.Dialog:
+									{
+										var lines = GetDialog(line, i);
+										if (lines.Length <= 1)
 										{
 											MessageBox.Show($"Неправильная разметка на строке {i} ({lines[0]})");
 											IsEditMode = false;
 											return;
 										}
+										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource, CroppedWidth, CroppedHeight, true, false);
+										break;
+									}
+								case FileTypes.None:
+									break;
+								case FileTypes.LeftAndDialog:
+									{
+										// сначала прогоняем текст до следующей строки, потом делим на имя и реплику
+										var lines = GetDialog(GetLine(ref i), i);
+										if (lines.Length <= 1)
+										{
+											MessageBox.Show($"Неправильная разметка на строке {i} ({lines[0]})");
+											IsEditMode = false;
+											return;
+										}
+										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource, CroppedWidth, CroppedHeight, true, true,
+											line.Split("|"));
 										break;
 									}
 							}
 							// делаем Source, чтобы отобразить на превью в списке
-							typeScreen.Source = typeScreen.Type == FileTypes.None ? typeScreen.FileSource : typeScreen.MakeSource(typeScreen.MakeImage());
+							typeScreen.Source = typeScreen.Type == FileTypes.None ? typeScreen.FileSource : typeScreen.MakeSource(typeScreen.MakeImage(), CroppedWidth, CroppedHeight);
 							CurrentScreen++;
 						}
 						catch (Exception e)
 						{
+							IsEditMode = false;
 							throw;
 						}
 					});
@@ -654,18 +753,28 @@ namespace AutoType.Classes
 				return;
 			}
 
+			if (CroppedWidth != null && CroppedHeight == null || CroppedWidth == null && CroppedHeight != null)
+			{
+				MessageBox.Show("Укажите все параметры для обрезки.");
+				return;
+			}
+
 			try
 			{
-				IEnumerable<TypeScreen> dialogScreens = Images.Where(item => item.Type == FileTypes.Dialog);
-				if (dialogScreens.Count() < 1)
+				IEnumerable<TypeScreen> dialogScreens = Images.Where(item => item.Type == FileTypes.Dialog || item.Type == FileTypes.LeftAndDialog);
+				if (!dialogScreens.Any())
 				{
 					MessageBox.Show("Отсутствует изображение с диалогом!");
 					return;
 				}
 
+				// в первую очередь ищем скриншот с рамкой диалога и левой рамкой
+				var imageExample = dialogScreens.FirstOrDefault(item => item.Type == FileTypes.LeftAndDialog);
+				// если не нашлось, то ищем просто с диалогом
+				imageExample ??= dialogScreens.FirstOrDefault(item => item.Type == FileTypes.Dialog);
 				ConfigurationWindow = new ConfigurationWindow
 				{
-					DataContext = new ConfigurationFrameModel(FileTypes.Dialog, dialogScreens.FirstOrDefault().FileSource, null) { Save = GetConfiguration }
+					DataContext = new ConfigurationFrameModel(imageExample.Type, imageExample.FileSource, null, CroppedWidth, CroppedHeight) { Save = GetConfiguration }
 				};
 				ConfigurationWindow.Show();
 			}
@@ -676,36 +785,58 @@ namespace AutoType.Classes
 			}
 		}
 
+		/// <summary>
+		/// Открыть окно с настройками для рамки места
+		/// </summary>
+		private void OpenPlaceConfiguration(Configuration config)
+		{
+			var placeScreen = Images.Where(item => item.Type == FileTypes.Place).FirstOrDefault();
+			if (placeScreen is null)
+			{
+				MessageBox.Show("Отсутствует изображение с местом!");
+				return;
+			}
+
+			ConfigurationWindow = new ConfigurationWindow
+			{
+				DataContext = new ConfigurationFrameModel(placeScreen.Type, placeScreen.FileSource, config, CroppedWidth, CroppedHeight) { Save = GetConfiguration }
+			};
+			ConfigurationWindow.Show();
+		}
+
 		private void GetConfiguration()
 		{
 			ConfigurationFrameModel dataContext = ConfigurationWindow.DataContext as ConfigurationFrameModel;
 			Configuration config = dataContext.MakeConfiguration();
 			ConfigurationWindow.Close();
-			if (dataContext.FileType == FileTypes.Dialog)
+			switch (dataContext.FileType)
 			{
-				IEnumerable<TypeScreen> placeScreens = Images.Where(item => item.Type == FileTypes.Place);
-				if (placeScreens.Count() < 1)
-				{
-					MessageBox.Show("Отсутствует изображение с местом!");
-					return;
-				}
-
-				ConfigurationWindow = new ConfigurationWindow
-				{
-					DataContext = new ConfigurationFrameModel(FileTypes.Place, placeScreens.FirstOrDefault().FileSource, config) { Save = GetConfiguration }
-				};
-				ConfigurationWindow.Show();
-			}
-			else
-			{
-				ConfigurationList.Add(config);
-				IsNotExistsConfiguration = false;
-				OnPropertyChanged(nameof(IsNotExistsConfiguration));
-				EditFileCommand = null;
-				CurrentConfig = config;
-				NavigateToPreviousConfigCommand = null;
-				NavigateToNextConfigCommand = null;
-				DeleteConfigCommand = null;
+				case FileTypes.Dialog:
+					var leftPlaceScreen = Images.Where(item => item.Type == FileTypes.Left).FirstOrDefault();
+					if (leftPlaceScreen is not null)
+					{
+						ConfigurationWindow = new ConfigurationWindow
+						{
+							DataContext = new ConfigurationFrameModel(leftPlaceScreen.Type, leftPlaceScreen.FileSource, config, CroppedWidth, CroppedHeight) { Save = GetConfiguration }
+						};
+						ConfigurationWindow.Show();
+					}
+					else OpenPlaceConfiguration(config);
+					break;
+				case FileTypes.Left:
+				case FileTypes.LeftAndDialog:
+					OpenPlaceConfiguration(config);
+					break;
+				case FileTypes.Place:
+					ConfigurationList.Add(config);
+					IsNotExistsConfiguration = false;
+					OnPropertyChanged(nameof(IsNotExistsConfiguration));
+					EditFileCommand = null;
+					CurrentConfig = config;
+					NavigateToPreviousConfigCommand = null;
+					NavigateToNextConfigCommand = null;
+					DeleteConfigCommand = null;
+					break;
 			}
 		}
 

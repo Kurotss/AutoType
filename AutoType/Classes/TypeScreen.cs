@@ -22,7 +22,6 @@ namespace AutoType.Classes
 				_source = value;
 				OnPropertyChanged(nameof(Source));
 				OnPropertyChanged(nameof(WidthForPreview));
-				//OnPropertyChanged(nameof(HeightForPreview));
 				OnPropertyChanged(nameof(IsNotNullSource));
 			}
 		}
@@ -36,11 +35,6 @@ namespace AutoType.Classes
 		/// Ширина картинки для превью в списке
 		/// </summary>
 		public double? WidthForPreview => SystemParameters.PrimaryScreenWidth / 3.2;
-
-		/// <summary>
-		/// Ширина картинки для превью в списке
-		/// </summary>
-		//public double? HeightForPreview => Source?.Height / 4;
 
 		/// <summary>
 		/// Заполнен ли Dource
@@ -85,7 +79,7 @@ namespace AutoType.Classes
 		/// </summary>
 		private void OpenControl()
 		{
-			if (Type == FileTypes.Place || Type == FileTypes.Dialog)
+			if (Type == FileTypes.Place || Type == FileTypes.Dialog || Type == FileTypes.LeftAndDialog)
 			{
 				Win = new(UserControl) { SaveAndClose = GetNewImage };
 				Win.Show();
@@ -102,7 +96,7 @@ namespace AutoType.Classes
 			{
 				UserControl = (UserControl)Win.viewBox.Child;
 				Win.viewBox.Child = null;
-				Source = MakeSource(MakeImage());
+				Source = MakeSource(MakeImage(), Source.Width, Source.Height);
 				Win.Close();
 				OnPropertyChanged(nameof(Source));
 			}
@@ -133,7 +127,7 @@ namespace AutoType.Classes
 				bmImage.StreamSource = stream;
 				bmImage.EndInit();
 
-				Image img = new() { Source = bmImage, Width = bmImage.Width, Height = bmImage.Height };
+				Image img = new() { Source = bmImage, Width = bmImage.Width, Height = bmImage.Height, HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
 				return img;
 			}
 			catch (Exception)
@@ -143,15 +137,28 @@ namespace AutoType.Classes
 		}
 
 		/// <summary>
-		/// Создание Source, чтобы его можно было подсунуть как источник в конртоль Image
+		/// Создание Source, чтобы его можно было подсунуть как источник в контроль Image
 		/// </summary>
-		public BitmapImage MakeSource(Image image)
+		public BitmapImage MakeSource(Image image, double? newWidth, double? newHeight)
 		{
 			try
 			{
-				image.Measure(new Size(image.Width, image.Height));
+				if (FrameMode == FrameMode.Old && newWidth != null && newHeight != null)
+				{
+					image.Measure(new Size((double)newWidth, (double)newHeight));
+				}
+				else
+					image.Measure(new Size(image.Width, image.Height));
 				image.Arrange(new Rect(new Point(0, 0), image.DesiredSize));
-				RenderTargetBitmap rtb = new((int)image.ActualWidth, (int)image.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+				RenderTargetBitmap rtb;
+				if (FrameMode == FrameMode.Old && newWidth != null && newHeight != null)
+				{
+					rtb = new((int)newWidth, (int)newHeight, 96, 96, PixelFormats.Pbgra32);
+				}
+				else
+				{
+					rtb = new((int)image.ActualWidth, (int)image.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+				}
 				rtb.Render(image);
 				//
 				PngBitmapEncoder png = new();
