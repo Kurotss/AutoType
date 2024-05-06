@@ -143,7 +143,7 @@ namespace AutoType.Classes
 		{
 			try
 			{
-				if (FrameMode == FrameMode.Old && newWidth != null && newHeight != null)
+				if (newWidth != null && newHeight != null)
 				{
 					image.Measure(new Size((double)newWidth, (double)newHeight));
 				}
@@ -151,7 +151,7 @@ namespace AutoType.Classes
 					image.Measure(new Size(image.Width, image.Height));
 				image.Arrange(new Rect(new Point(0, 0), image.DesiredSize));
 				RenderTargetBitmap rtb;
-				if (FrameMode == FrameMode.Old && newWidth != null && newHeight != null)
+				if (newWidth != null && newHeight != null)
 				{
 					rtb = new((int)newWidth, (int)newHeight, 96, 96, PixelFormats.Pbgra32);
 				}

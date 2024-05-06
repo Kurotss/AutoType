@@ -1,5 +1,4 @@
-﻿using Microsoft.Office.Interop.Word;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
@@ -273,7 +272,7 @@ namespace AutoType.Classes
 
 		#region SaveAndCloseCommand
 
-		public System.Action Save;
+		public Action Save;
 
 		private RelayCommand _saveAndCloseCommand;
 

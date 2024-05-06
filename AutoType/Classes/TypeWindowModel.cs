@@ -15,7 +15,6 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Application = System.Windows.Application;
 using MessageBox = System.Windows.MessageBox;
 using OpenFileDialog = Microsoft.Win32.OpenFileDialog;
@@ -587,12 +586,12 @@ namespace AutoType.Classes
 				return false;
 			}
 			var img = Images.FirstOrDefault();
-			if (FrameMode == FrameMode.Old && (img?.FileSource.Width - CroppedWidth < 0 || img?.FileSource.Height - CroppedHeight < 0))
+			if (img?.FileSource.Width - CroppedWidth < 0 || img?.FileSource.Height - CroppedHeight < 0)
 			{
 				MessageBox.Show("Параметры для обрезки не должны быть больше исходных размеров картинок.");
 				return false;
 			}
-			if (FrameMode == FrameMode.Old && (CroppedWidth != null && CroppedHeight == null || CroppedWidth == null && CroppedHeight != null))
+			if (CroppedWidth != null && CroppedHeight == null || CroppedWidth == null && CroppedHeight != null)
 			{
 				MessageBox.Show("Укажите все параметры для обрезки.");
 				return false;
@@ -658,6 +657,8 @@ namespace AutoType.Classes
 			var i = 0;
 			foreach (TypeScreen typeScreen in Images)
 			{
+				if (!IsEditMode)
+					break;
 				var thread = new Thread(() =>
 				{
 					Application.Current.Dispatcher.Invoke(() =>
@@ -720,13 +721,17 @@ namespace AutoType.Classes
 									}
 							}
 							// делаем Source, чтобы отобразить на превью в списке
-							typeScreen.Source = typeScreen.Type == FileTypes.None ? typeScreen.FileSource : typeScreen.MakeSource(typeScreen.MakeImage(), CroppedWidth, CroppedHeight);
+							// если тип none, то просто делаем control image и в качестве источника подсовываем скрин, иначе берём usercontrol и преобразовываем к image
+							typeScreen.Source = typeScreen.MakeSource(typeScreen.Type == FileTypes.None ?
+								new System.Windows.Controls.Image() { Source = typeScreen.FileSource, Width = typeScreen.FileSource.Width, Height = typeScreen.FileSource.Height, HorizontalAlignment = System.Windows.HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Top } :
+								typeScreen.MakeImage(), CroppedWidth, CroppedHeight);
 							CurrentScreen++;
 						}
 						catch (Exception e)
 						{
 							IsEditMode = false;
-							throw;
+							MessageBox.Show(e.Message);
+							return;
 						}
 					});
 				});

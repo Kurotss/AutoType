@@ -7,6 +7,7 @@
         <DataTemplate.Resources>
             <classes:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
             <classes:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter"/>
+            <classes:StringToDoubleConverter x:Key="StringToDoubleConverter"/>
             <classes:BoolToVisibilityConverter x:Key="InvertBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
             <Style x:Key="listBoxItemButtonStyle" TargetType="Button">
                 <Setter Property="Template">
@@ -89,9 +90,9 @@
                                 <ColumnDefinition/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Width="80" Text="{Binding CroppedWidth, UpdateSourceTrigger=PropertyChanged}" FontSize="15"/>
+                            <TextBox Width="80" Text="{Binding CroppedWidth, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToDoubleConverter}}" FontSize="15"/>
                             <TextBlock Text="x" FontSize="15" Grid.Column="1"/>
-                            <TextBox Width="80" Text="{Binding CroppedHeight, UpdateSourceTrigger=PropertyChanged}" FontSize="15" Grid.Column="2"/>
+                            <TextBox Width="80" Text="{Binding CroppedHeight, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToDoubleConverter}}" FontSize="15" Grid.Column="2"/>
                         </Grid>
                     </StackPanel>
                 </Expander>
@@ -184,8 +185,6 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding FrameMode}" Value="{x:Static classes:FrameMode.New}">
                 <Setter TargetName="gridSettings" Property="Visibility" Value="Collapsed"/>
-                <Setter TargetName="txtCropped" Property="Visibility" Value="Collapsed"/>
-                <Setter TargetName="gridCropped" Property="Visibility" Value="Collapsed"/>
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>

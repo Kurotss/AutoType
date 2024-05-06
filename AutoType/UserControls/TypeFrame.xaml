@@ -8,7 +8,7 @@
 
     <Grid>
         <Image Name="screen" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-        <Grid Name="gridOld" Visibility="Collapsed">
+        <Grid Name="gridOld" >
             <Image Name="imgMenu" Source="../Resources/menu.png" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="2335" Height="1080"/>
             <Grid Name="gridLeftPlace" HorizontalAlignment="Center" VerticalAlignment="Bottom" Visibility="Collapsed">
                 <Image Source="../Resources/left_place.png" Width="2335" Height="1080" HorizontalAlignment="Center" VerticalAlignment="Bottom"  />
@@ -22,15 +22,15 @@
                 <TextBox Name="txtLeftPlace" Foreground="White" FontSize="31pt" Height="50" Width="505" Background="Transparent" BorderThickness="0"
                          HorizontalAlignment="Center" VerticalAlignment="Bottom" FontFamily="../Resources/#Casper Bold" Margin="0 0 1555 976"/>
             </Grid>
-            <Grid Name="gridFrame" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
-                <Image Source="../Resources/frame.png" Width="2335" Height="1080" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
+            <Grid Name="gridFrame" VerticalAlignment="Bottom" HorizontalAlignment="Center" >
+                <Image Name="imgFrameOld" Source="../Resources/frame.png" Width="2335" Height="1080" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
                 <TextBlock Name="txtName" Foreground="White" FontSize="53" Height="60" Width="550"
                    HorizontalAlignment="Center" VerticalAlignment="Bottom" FontFamily="../Resources/#Etelka Pro" Margin="0 0 780 273" />
-                <TextBox Name="txtDescr" Foreground="#454257" FontSize="32.5pt" Height="200" Width="1400" Background="Transparent" BorderThickness="0" AcceptsReturn="True"
-                   HorizontalAlignment="Center" VerticalAlignment="Bottom" FontFamily="../Resources/#Etelka Pro" Margin="-30 0 0 50" TextWrapping="Wrap"/>
+                <TextBox Name="txtDescr" Foreground="#454257" FontSize="32.5pt" Height="200" Width="1440" Background="Transparent" BorderThickness="0" AcceptsReturn="True"
+                   HorizontalAlignment="Center" VerticalAlignment="Bottom" FontFamily="../Resources/#Etelka Pro" Margin="0 0 0 50" TextWrapping="Wrap"/>
             </Grid>
         </Grid>
-        <Grid Name="gridNew" Visibility="Collapsed">
+        <Grid Name="gridNew" Visibility="Collapsed" VerticalAlignment="Bottom" HorizontalAlignment="Center">
             <Image Name="imgFrameNew" Source="../Resources/frame_new.png" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="2280" Height="1080"/>
             <classes:OutlinedTextBlock x:Name="txtNameNew" Fill="White" FontSize="42.5pt" Width="565" Margin="0 0 1065.5 315.5" 
                 FontFamily="../Resources/#Etelka Pro" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Left"
