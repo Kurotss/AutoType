@@ -955,25 +955,64 @@ namespace AutoType.Classes
 
 		#region Methods
 
+		public static Bitmap ToImage(byte[] bytes)
+		{
+			using (var stream = new MemoryStream(bytes))
+			using (var image = Image.FromStream(stream, false, true))
+			{
+				return new Bitmap(image);
+			}
+		}
+		private static ImageCodecInfo GetEncoderInfo(String mimeType)
+		{
+			int j;
+			ImageCodecInfo[] encoders;
+			encoders = ImageCodecInfo.GetImageEncoders();
+			for (j = 0; j < encoders.Length; ++j)
+			{
+				if (encoders[j].MimeType == mimeType)
+					return encoders[j];
+			}
+			return null;
+		}
+
 		private static BitmapImage CreateSource(byte[] bytes, string ext)
 		{
 			var bi = new BitmapImage();
-			MemoryStream stream = new(bytes);
-			Bitmap bmp = (Bitmap)Image.FromStream(stream);
+			Bitmap bmp = ToImage(bytes);
 			using (var ms = new MemoryStream())
 			{
+				ImageCodecInfo myImageCodecInfo;
+
 				switch (ext)
 				{
 					case ".png":
-						bmp.Save(ms, ImageFormat.Png);
+						myImageCodecInfo = GetEncoderInfo("image/png");
 						break;
 					case ".jpeg":
-						bmp.Save(ms, ImageFormat.Jpeg);
+						myImageCodecInfo = GetEncoderInfo("image/jpeg");
 						break;
 					default:
-						bmp.Save(ms, ImageFormat.Jpeg);
+						myImageCodecInfo = GetEncoderInfo("image/jpeg");
 						break;
 				}
+
+				// Create an Encoder object based on the GUID
+				// for the ColorDepth parameter category.
+				Encoder myEncoder = Encoder.ColorDepth;
+
+				// Create an EncoderParameters object.
+				// An EncoderParameters object has an array of EncoderParameter
+				// objects. In this case, there is only one
+				// EncoderParameter object in the array.
+				EncoderParameters myEncoderParameters = new EncoderParameters(1);
+
+				// Save the image with a color depth of 24 bits per pixel.
+				EncoderParameter myEncoderParameter =
+					new EncoderParameter(myEncoder, 24L);
+				myEncoderParameters.Param[0] = myEncoderParameter;
+				bmp.Save(ms, myImageCodecInfo, myEncoderParameters);
+
 				ms.Position = 0;
 				bi.BeginInit();
 				bi.CacheOption = BitmapCacheOption.OnLoad;

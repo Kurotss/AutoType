@@ -8,7 +8,7 @@
 
     <Grid>
         <Image Name="screen" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-        <Grid Name="gridOld" >
+        <Grid Name="gridOld" Visibility="Collapsed">
             <Image Name="imgMenu" Source="../Resources/menu.png" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="2335" Height="1080"/>
             <Grid Name="gridLeftPlace" HorizontalAlignment="Center" VerticalAlignment="Bottom" Visibility="Collapsed">
                 <Image Source="../Resources/left_place.png" Width="2335" Height="1080" HorizontalAlignment="Center" VerticalAlignment="Bottom"  />
@@ -22,7 +22,7 @@
                 <TextBox Name="txtLeftPlace" Foreground="White" FontSize="31pt" Height="50" Width="505" Background="Transparent" BorderThickness="0"
                          HorizontalAlignment="Center" VerticalAlignment="Bottom" FontFamily="../Resources/#Casper Bold" Margin="0 0 1555 976"/>
             </Grid>
-            <Grid Name="gridFrame" VerticalAlignment="Bottom" HorizontalAlignment="Center" >
+            <Grid Name="gridFrame" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
                 <Image Name="imgFrameOld" Source="../Resources/frame.png" Width="2335" Height="1080" VerticalAlignment="Bottom" HorizontalAlignment="Center"/>
                 <TextBlock Name="txtName" Foreground="White" FontSize="53" Height="60" Width="550"
                    HorizontalAlignment="Center" VerticalAlignment="Bottom" FontFamily="../Resources/#Etelka Pro" Margin="0 0 780 273" />
