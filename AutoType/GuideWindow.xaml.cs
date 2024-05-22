@@ -51,7 +51,7 @@ namespace AutoType
 
 		public void LoadDocument()
 		{
-			XpsDocument doc = new(Path, FileAccess.Read);
+			using XpsDocument doc = new(Path, FileAccess.Read);
 			documentViewer.Document = doc.GetFixedDocumentSequence();
 		}
 	}
