@@ -29,7 +29,7 @@ namespace AutoType
 			{
 				try
 				{
-					string json = JsonSerializer.Serialize(context.ConfigurationList);
+					string json = JsonSerializer.Serialize(context.AllConfigurationList);
 					using StreamWriter writer = new(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/AutoType/ConfigurationSekai.txt", false);
 					writer.WriteLineAsync(json);
 				}

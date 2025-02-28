@@ -18,6 +18,21 @@ namespace AutoType.Classes
 
 		public string ConfigurationName { get; set; }
 
-		public bool IsSelected { get; set; }
+		private FrameMode _frameMode;
+
+		/// <summary>
+		/// Тип рамки: новая или старая, по умолчанию старая
+		/// </summary>
+		public FrameMode FrameMode
+		{
+			get => _frameMode;
+			set
+			{
+				if (value == 0)
+					_frameMode = FrameMode.Old;
+				else
+					_frameMode = value;
+			}
+		}
 	}
 }

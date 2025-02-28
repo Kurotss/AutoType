@@ -13,7 +13,7 @@ namespace AutoType.UserControls
 	/// </summary>
 	public partial class TypeLocation : UserControl
 	{
-		public TypeLocation(string place, bool isPlace, Configuration config, FrameMode frameMode, BitmapImage source, double? CroppedWidth, double? CroppedHeight)
+		public TypeLocation(string place, bool isPlace, Configuration config, BitmapImage source, double? CroppedWidth, double? CroppedHeight)
 		{
 			InitializeComponent();
 			// устанавливаем размеры контроля под размеры необрезанного скриншота
@@ -25,7 +25,7 @@ namespace AutoType.UserControls
 			else
 				screen.Source = new CroppedBitmap(source, new Int32Rect((int)(source.Width - CroppedWidth) / 2, (int)(source.Height - CroppedHeight) / 2, (int)CroppedWidth, (int)CroppedHeight));
 			// режим старой рамки
-			if (frameMode == FrameMode.Old)
+			if (config?.FrameMode == FrameMode.Old)
 			{
 				txtPlace.Text = place;
 				//
@@ -45,6 +45,7 @@ namespace AutoType.UserControls
 				gridNew.Visibility = Visibility.Visible;
 				//
 				txtPlaceNew.Text = place;
+				gridNew.RenderTransform = new ScaleTransform(config.Scale, config.Scale, imgPlaceNew.Width / 2, imgPlaceNew.Height / 2);
 			}
 			DataContext = this;
 		}

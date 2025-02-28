@@ -128,7 +128,7 @@
             <!--Вспомогательные элементы: шкала прогресса для методов, гайд-->
             <Grid Grid.Row="4">
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="2.3.0" FontSize="20" VerticalAlignment="Center"/>
+                    <TextBlock Text="2.4.0" FontSize="20" VerticalAlignment="Center"/>
                     <MediaElement Source="https://media1.tenor.com/m/XgUPenOrqEgAAAAC/하피하피.gif" MediaEnded="MediaElement_MediaEnded"/>
                 </StackPanel>
                 <Grid Name="progressBar" Visibility="Collapsed" HorizontalAlignment="Center">
@@ -182,9 +182,6 @@
             </DataTrigger>
             <DataTrigger Binding="{Binding IsSaveImagesMode}" Value="True">
                 <Setter TargetName="progressBar" Property="Visibility" Value="Visible"/>
-            </DataTrigger>
-            <DataTrigger Binding="{Binding FrameMode}" Value="{x:Static classes:FrameMode.New}">
-                <Setter TargetName="gridSettings" Property="Visibility" Value="Collapsed"/>
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>

@@ -6,7 +6,7 @@ namespace AutoType.Classes
 {
 	public class ConfigurationFrameModel : BaseDataContext
 	{
-		public ConfigurationFrameModel(FileTypes fileType, BitmapSource image, Configuration? config, double? croppedWidth, double? croppedHeight)
+		public ConfigurationFrameModel(FileTypes fileType, BitmapSource image, Configuration? config, double? croppedWidth, double? croppedHeight, FrameMode frameMode)
 		{
 			if (image.Width - croppedWidth < 0 || image.Height - croppedHeight < 0)
 				throw new ArgumentException("Параметры для обрезки не должны быть больше исходных размеров картинок.");
@@ -32,6 +32,7 @@ namespace AutoType.Classes
 				}
 				Scale = config.Scale;
 			}
+			FrameMode = frameMode;
 		}
 
 		#region Properties
@@ -263,8 +264,17 @@ namespace AutoType.Classes
 		/// <summary>
 		/// Настройки
 		/// </summary>
-		/// 
-		public Configuration Config { get; set; }
+		public Configuration? Config { get; set; }
+
+		/// <summary>
+		/// Тип рамки
+		/// </summary>
+		public FrameMode FrameMode { get; set; }
+
+		/// <summary>
+		/// Это старая рамка?
+		/// </summary>
+		public bool IsOldFrame => FrameMode == FrameMode.Old;
 
 		#endregion
 
@@ -295,36 +305,31 @@ namespace AutoType.Classes
 		/// </summary>
 		public Configuration MakeConfiguration()
 		{
+			var config = Config ?? new Configuration();
+			config.FrameMode = FrameMode;
+			config.ConfigurationName = Math.Round(ImageExample.Width).ToString() + " x " + Math.Round(ImageExample.Height).ToString();
 			switch (FileType)
 			{
 				case FileTypes.Dialog:
-					return new Configuration()
-					{
-						ConfigurationName = Math.Round(ImageExample.Width).ToString() + " x " + Math.Round(ImageExample.Height).ToString(),
-						MarginForDialog = new Thickness(MarginForFrame.Left, MarginForFrame.Top, MarginForFrame.Right, MarginForFrame.Bottom),
-						MarginForMenu = new Thickness(MarginForMenu.Left, MarginForMenu.Top, MarginForMenu.Right, MarginForMenu.Bottom),
-						Scale = Scale
-					};
+					config.MarginForDialog = new Thickness(MarginForFrame.Left, MarginForFrame.Top, MarginForFrame.Right, MarginForFrame.Bottom);
+					config.MarginForMenu = new Thickness(MarginForMenu.Left, MarginForMenu.Top, MarginForMenu.Right, MarginForMenu.Bottom);
+					config.Scale = Scale;
+					break;
 				case FileTypes.LeftAndDialog:
-					return new Configuration()
-					{
-						ConfigurationName = Math.Round(ImageExample.Width).ToString() + " x " + Math.Round(ImageExample.Height).ToString(),
-						MarginForDialog = new Thickness(MarginForFrame.Left, MarginForFrame.Top, MarginForFrame.Right, MarginForFrame.Bottom),
-						MarginForMenu = new Thickness(MarginForMenu.Left, MarginForMenu.Top, MarginForMenu.Right, MarginForMenu.Bottom),
-						MarginForLeftPlace = new Thickness(MarginForLeftPlace.Left, MarginForLeftPlace.Top, MarginForLeftPlace.Right, MarginForLeftPlace.Bottom),
-						Scale = Scale
-					};
+					config.MarginForDialog = new Thickness(MarginForFrame.Left, MarginForFrame.Top, MarginForFrame.Right, MarginForFrame.Bottom);
+					config.MarginForMenu = new Thickness(MarginForMenu.Left, MarginForMenu.Top, MarginForMenu.Right, MarginForMenu.Bottom);
+					config.MarginForLeftPlace = new Thickness(MarginForLeftPlace.Left, MarginForLeftPlace.Top, MarginForLeftPlace.Right, MarginForLeftPlace.Bottom);
+					config.Scale = Scale;
+					break;
 				case FileTypes.Left:
-					{
-						Config.MarginForLeftPlace = new Thickness(MarginForLeftPlace.Left, MarginForLeftPlace.Top, MarginForLeftPlace.Right, MarginForLeftPlace.Bottom);
-						return Config;
-					}
+					config.MarginForLeftPlace = new Thickness(MarginForLeftPlace.Left, MarginForLeftPlace.Top, MarginForLeftPlace.Right, MarginForLeftPlace.Bottom);
+					break;
 				case FileTypes.Place:
-					Config.MarginForPlace = new Thickness(MarginForFrame.Left, MarginForFrame.Top, MarginForFrame.Right, MarginForFrame.Bottom);
-					return Config;
-				default:
-					return new Configuration();
+					config.MarginForPlace = new Thickness(MarginForFrame.Left, MarginForFrame.Top, MarginForFrame.Right, MarginForFrame.Bottom);
+					config.Scale = Scale;
+					break;
 			}
+			return config;
 		}
 
 		#endregion

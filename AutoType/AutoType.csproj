@@ -18,10 +18,12 @@
     <None Remove="Resources\frame_new.png" />
     <None Remove="Resources\icon.png" />
     <None Remove="Resources\left_place.png" />
+    <None Remove="Resources\left_place_new.png" />
     <None Remove="Resources\menu.png" />
     <None Remove="Resources\place_new.png" />
     <None Remove="Resources\ramka.png" />
     <None Remove="Resources\save.png" />
+    <None Remove="Resources\sekai.ttf" />
   </ItemGroup>
 
   <ItemGroup>
@@ -59,16 +61,26 @@
     <Resource Include="Resources\frame.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\frame_new.png" />
+    <Resource Include="Resources\frame_new.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\icon.png" />
     <Resource Include="Resources\left_place.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\left_place_new.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\menu.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\place_new.png" />
+    <Resource Include="Resources\place_new.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\ramka.png" />
     <Resource Include="Resources\save.png" />
+    <Resource Include="Resources\sekai.ttf">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 </Project>

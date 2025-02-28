@@ -9,14 +9,16 @@
         Closing="WindowClosing"
         Icon="Resources/icon.png">
     
-    <Grid Name="mainGrid" Width="2000">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="70"/>
+    <Grid>
+        <!--<Grid.RowDefinitions>
+            <RowDefinition Height="70px"/>
             <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Viewbox Name="viewBox" Width="{Binding ImageWidth}" Height="{Binding ImageHeight}" Grid.Row="1"/>
+        </Grid.RowDefinitions>-->
+            <Viewbox Name="viewBox" VerticalAlignment="Top" HorizontalAlignment="Center"/>
+            
 
-        <Button ToolTip="Сохранить и выйти?" Click="SaveAndCloseAction" Width="50" Height="50" Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Left">
+            <Button ToolTip="Сохранить и выйти?" Click="SaveAndCloseAction" Width="50" Height="50" Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Left"
+                VerticalAlignment="Top">
             <Button.Content>
                 <Image Source="Resources/save.png"/>
             </Button.Content>

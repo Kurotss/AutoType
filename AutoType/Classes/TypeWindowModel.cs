@@ -36,16 +36,16 @@ namespace AutoType.Classes
 				if (!Directory.Exists(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/AutoType"))
 					Directory.CreateDirectory(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/AutoType");
 				string path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/AutoType/ConfigurationSekai.txt";
-				// либо файла с настройками нет, либо получаем из файла все настройки и загружаем в программу 
-				if (!File.Exists(path))
-					IsNotExistsConfiguration = true;
-				else
+				if (File.Exists(path))
 				{
 					using StreamReader reader = new(path);
 					string text = reader.ReadToEnd();
-					ConfigurationList = JsonSerializer.Deserialize<List<Configuration>>(text);
-					CurrentConfig = ConfigurationList.Find(item => item.IsSelected);
+					AllConfigurationList = new ObservableCollection<Configuration>( JsonSerializer.Deserialize<List<Configuration>>(text));
+					CurrentConfig = ConfigurationList.FirstOrDefault();
 				}
+				OnPropertyChanged(nameof(IsNotExistsConfiguration));
+				OnPropertyChanged(nameof(ConfigurationList));
+				//}
 			}
 			catch (Exception e)
 			{
@@ -169,30 +169,29 @@ namespace AutoType.Classes
 		/// <summary>
 		/// Не определено никаких настроек: да/нет
 		/// </summary>
-		public bool IsNotExistsConfiguration
-		{
-			get => _isNotExistsConfiguration;
-			set
-			{
-				_isNotExistsConfiguration = value;
-				OnPropertyChanged(nameof(IsNotExistsConfiguration));
-			}
-		}
+		public bool IsNotExistsConfiguration => ConfigurationList.Count() < 1;
+		//{
+		//	get => _isNotExistsConfiguration;
+		//	set
+		//	{
+		//		_isNotExistsConfiguration = value;
+		//		OnPropertyChanged(nameof(IsNotExistsConfiguration));
+		//	}
+		//}
 
 		#endregion
 
 		#region ConfigurationList
 
-		private List<Configuration> _сonfigurationList;
+		/// <summary>
+		/// Список настроек наложения под нужную рамку
+		/// </summary>
+		public ObservableCollection<Configuration> ConfigurationList => new(AllConfigurationList.Where(item => item.FrameMode == FrameMode));
 
 		/// <summary>
-		/// Список настроек наложения
+		/// Список всех настроек наложения под все рамки
 		/// </summary>
-		public List<Configuration> ConfigurationList
-		{
-			get => _сonfigurationList ??= new List<Configuration>();
-			set => _сonfigurationList = value;
-		}
+		public ObservableCollection<Configuration> AllConfigurationList { get; set; } = new ObservableCollection<Configuration>();
 
 		#endregion
 
@@ -209,8 +208,15 @@ namespace AutoType.Classes
 			set
 			{
 				_frameMode = value;
-				EditFileCommand = null;
+				OnPropertyChanged(nameof(ConfigurationList));
+				OnPropertyChanged(nameof(IsNotExistsConfiguration));
 				OnPropertyChanged(nameof(FrameMode));
+				CurrentConfig = ConfigurationList.FirstOrDefault();
+				EditFileCommand = null;
+				NavigateToPreviousConfigCommand = null;
+				NavigateToNextConfigCommand = null;
+				DeleteConfigCommand = null;
+				EditFileCommand = null;
 			}
 		}
 
@@ -229,9 +235,6 @@ namespace AutoType.Classes
 			set
 			{
 				_currentConfig = value;
-				ConfigurationList.ForEach(item => item.IsSelected = false);
-				if (_currentConfig != null)
-					_currentConfig.IsSelected = true;
 				OnPropertyChanged(nameof(CurrentConfig));
 			}
 		}
@@ -553,7 +556,7 @@ namespace AutoType.Classes
 
 		public RelayCommand? EditFileCommand
 		{
-			get => _editFileCommand ??= new RelayCommand(EditFile, param => !IsNotExistsConfiguration || FrameMode == FrameMode.New);
+			get => _editFileCommand ??= new RelayCommand(EditFile, param => !IsNotExistsConfiguration);
 			set
 			{
 				_editFileCommand = value;
@@ -677,12 +680,12 @@ namespace AutoType.Classes
 							{
 								case FileTypes.Menu:
 									{
-										typeScreen.UserControl = new TypeLocation(string.Empty, false, CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource, CroppedWidth, CroppedHeight);
+										typeScreen.UserControl = new TypeLocation(string.Empty, false, CurrentConfig ?? new Configuration(), typeScreen.FileSource, CroppedWidth, CroppedHeight);
 										break;
 									}
 								case FileTypes.Place:
 									{
-										typeScreen.UserControl = new TypeLocation(line, true, CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource, CroppedWidth, CroppedHeight);
+										typeScreen.UserControl = new TypeLocation(line, true, CurrentConfig ?? new Configuration(), typeScreen.FileSource, CroppedWidth, CroppedHeight);
 										break;
 									}
 								case FileTypes.Left:
@@ -773,15 +776,21 @@ namespace AutoType.Classes
 					return;
 				}
 
-				// в первую очередь ищем скриншот с рамкой диалога и левой рамкой
-				var imageExample = dialogScreens.FirstOrDefault(item => item.Type == FileTypes.LeftAndDialog);
-				// если не нашлось, то ищем просто с диалогом
-				imageExample ??= dialogScreens.FirstOrDefault(item => item.Type == FileTypes.Dialog);
-				ConfigurationWindow = new ConfigurationWindow
+				if (FrameMode == FrameMode.Old)
 				{
-					DataContext = new ConfigurationFrameModel(imageExample.Type, imageExample.FileSource, null, CroppedWidth, CroppedHeight) { Save = GetConfiguration }
-				};
-				ConfigurationWindow.Show();
+					// в первую очередь ищем скриншот с рамкой диалога и левой рамкой
+					var imageExample = dialogScreens.FirstOrDefault(item => item.Type == FileTypes.LeftAndDialog);
+					// если не нашлось, то ищем просто с диалогом
+					imageExample ??= dialogScreens.FirstOrDefault(item => item.Type == FileTypes.Dialog);
+					ConfigurationWindow = new ConfigurationWindow
+					{
+						DataContext = new ConfigurationFrameModel(imageExample.Type, imageExample.FileSource, null, CroppedWidth, CroppedHeight, FrameMode) { Save = GetConfiguration }
+					};
+					ConfigurationWindow.Show();
+				}
+				else if (FrameMode == FrameMode.New)
+					OpenPlaceConfiguration(null);
+
 			}
 			catch (Exception e)
 			{
@@ -793,7 +802,7 @@ namespace AutoType.Classes
 		/// <summary>
 		/// Открыть окно с настройками для рамки места
 		/// </summary>
-		private void OpenPlaceConfiguration(Configuration config)
+		private void OpenPlaceConfiguration(Configuration? config)
 		{
 			var placeScreen = Images.Where(item => item.Type == FileTypes.Place).FirstOrDefault();
 			if (placeScreen is null)
@@ -804,7 +813,7 @@ namespace AutoType.Classes
 
 			ConfigurationWindow = new ConfigurationWindow
 			{
-				DataContext = new ConfigurationFrameModel(placeScreen.Type, placeScreen.FileSource, config, CroppedWidth, CroppedHeight) { Save = GetConfiguration }
+				DataContext = new ConfigurationFrameModel(placeScreen.Type, placeScreen.FileSource, config, CroppedWidth, CroppedHeight, FrameMode) { Save = GetConfiguration }
 			};
 			ConfigurationWindow.Show();
 		}
@@ -822,7 +831,7 @@ namespace AutoType.Classes
 					{
 						ConfigurationWindow = new ConfigurationWindow
 						{
-							DataContext = new ConfigurationFrameModel(leftPlaceScreen.Type, leftPlaceScreen.FileSource, config, CroppedWidth, CroppedHeight) { Save = GetConfiguration }
+							DataContext = new ConfigurationFrameModel(leftPlaceScreen.Type, leftPlaceScreen.FileSource, config, CroppedWidth, CroppedHeight, FrameMode) { Save = GetConfiguration }
 						};
 						ConfigurationWindow.Show();
 					}
@@ -833,9 +842,9 @@ namespace AutoType.Classes
 					OpenPlaceConfiguration(config);
 					break;
 				case FileTypes.Place:
-					ConfigurationList.Add(config);
-					IsNotExistsConfiguration = false;
+					AllConfigurationList.Add(config);
 					OnPropertyChanged(nameof(IsNotExistsConfiguration));
+					OnPropertyChanged(nameof(ConfigurationList));
 					EditFileCommand = null;
 					CurrentConfig = config;
 					NavigateToPreviousConfigCommand = null;
@@ -918,17 +927,18 @@ namespace AutoType.Classes
 			if (ConfigurationList.Count == 1)
 			{
 				CurrentConfig = null;
-				IsNotExistsConfiguration = true;
 			}
 			else if (index == ConfigurationList.Count - 1)
 				CurrentConfig = ConfigurationList[index - 1];
 			else
 				CurrentConfig = ConfigurationList[index + 1];
-			ConfigurationList.RemoveAt(index);
+			AllConfigurationList.RemoveAt(index);
 			NavigateToPreviousConfigCommand = null;
 			NavigateToNextConfigCommand = null;
 			DeleteConfigCommand = null;
 			EditFileCommand = null;
+			OnPropertyChanged(nameof(IsNotExistsConfiguration));
+			OnPropertyChanged(nameof(ConfigurationList));
 		}
 
 		#endregion

@@ -23,7 +23,7 @@
                            HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
 
                     <!--Меню-->
-                    <Image Source="../Resources/menu.png" Margin="{Binding MarginForMenu}" Height="1080" Width="2335"
+                    <Image x:Name="imgMenu" Source="../Resources/menu.png" Margin="{Binding MarginForMenu}" Height="1080" Width="2335"
                            HorizontalAlignment="Center" VerticalAlignment="Bottom">
                         <Image.RenderTransform>
                             <ScaleTransform CenterX="1167.5" CenterY="540" ScaleX="{Binding Scale}" ScaleY="{Binding Scale}"/>
@@ -52,6 +52,14 @@
                         Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Image.RenderTransform>
                             <ScaleTransform CenterX="1167.5" CenterY="540" ScaleX="{Binding Scale}" ScaleY="{Binding Scale}"/>
+                        </Image.RenderTransform>
+                    </Image>
+
+                    <!--Новая рамка места-->
+                    <Image Name="imgRamkaNew" Source="../Resources/place_new.png" Height="1080" Width="2400"
+                        Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Image.RenderTransform>
+                            <ScaleTransform CenterX="1200" CenterY="540" ScaleX="{Binding Scale}" ScaleY="{Binding Scale}"/>
                         </Image.RenderTransform>
                     </Image>
                 </Grid>
@@ -175,15 +183,21 @@
             </Grid>
         </Grid>
         <DataTemplate.Triggers>
-            <DataTrigger Binding="{Binding FileType}" Value="{x:Static configurationFrame:FileTypes.Place}">
-                <Setter TargetName="textMenu" Property="Visibility" Value="Collapsed"/>
-                <Setter TargetName="stackPanelMenu" Property="Visibility" Value="Collapsed"/>
-                <Setter TargetName="imgRamka" Property="Visibility" Value="Visible"/>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding FileType}" Value="{x:Static configurationFrame:FileTypes.Place}"/>
+                    <Condition Binding="{Binding FrameMode}" Value="{x:Static configurationFrame:FrameMode.Old}" />
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter TargetName="textMenu" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="stackPanelMenu" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="imgRamka" Property="Visibility" Value="Visible"/>
 
-                <Setter TargetName="gridScale" Property="Visibility" Value="Collapsed"/>
-                <Setter TargetName="textScale" Property="Visibility" Value="Collapsed"/>
-                <Setter TargetName="sliderOpacity" Property="Value" Value="{Binding ElementName=imgRamka, Path=Opacity, UpdateSourceTrigger=PropertyChanged}"/>
-            </DataTrigger>
+                    <Setter TargetName="gridScale" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="textScale" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="sliderOpacity" Property="Value" Value="{Binding ElementName=imgRamka, Path=Opacity, UpdateSourceTrigger=PropertyChanged}"/>
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
             <DataTrigger Binding="{Binding FileType}" Value="{x:Static configurationFrame:FileTypes.Dialog}">
                 <Setter TargetName="imgFrame" Property="Visibility" Value="Visible"/>
             </DataTrigger>
@@ -207,6 +221,24 @@
                 <Setter TargetName="textLeftPlace" Property="Visibility" Value="Visible"/>
                 <Setter TargetName="stackPanelLeftPlace" Property="Visibility" Value="Visible"/>
             </DataTrigger>
+
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding FileType}" Value="{x:Static configurationFrame:FileTypes.Place}"/>
+                    <Condition Binding="{Binding FrameMode}" Value="{x:Static configurationFrame:FrameMode.New}" />
+                </MultiDataTrigger.Conditions>
+                <MultiDataTrigger.Setters>
+                    <Setter TargetName="imgRamkaNew" Property="Visibility" Value="Visible"/>
+                    <Setter TargetName="imgMenu" Property="Visibility" Value="Collapsed"/>
+
+                    <Setter TargetName="stackPanelFrame" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="textFrame" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="textMenu" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="stackPanelMenu" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="textOpacity" Property="Visibility" Value="Collapsed"/>
+                    <Setter TargetName="gridOpacity" Property="Visibility" Value="Collapsed"/>
+                </MultiDataTrigger.Setters>
+            </MultiDataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>
 </ResourceDictionary>

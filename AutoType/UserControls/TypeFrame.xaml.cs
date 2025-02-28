@@ -16,15 +16,15 @@ namespace AutoType.UserControls
 			bool isDialog, bool isLeftPlace, string[]? leftPlaceDescr = null)
 		{
 			InitializeComponent();
-			// устанавливаем размеры контроля под размеры необрезанного скриншота
-			Height = source.Height;
-			Width = source.Width;
 			// если не указаны параметры по обрезке скринов, то устанавливаем исходные скрины
 			if (CroppedWidth == null || CroppedHeight == null)
 				screen.Source = source;
 			// иначе обрезаем скрины и устанавливаем их
 			else
 				screen.Source = new CroppedBitmap(source, new Int32Rect((int)(source.Width - CroppedWidth) / 2, (int)(source.Height - CroppedHeight) / 2, (int)CroppedWidth, (int)CroppedHeight));
+			// устанавливаем размеры контроля под размеры необрезанного скриншота
+			Height = screen.Source.Height;
+			Width = screen.Source.Width;
 			// режим старой рамки
 			if (frameMode == FrameMode.Old)
 			{
@@ -36,8 +36,8 @@ namespace AutoType.UserControls
 					txtName.Text = characterName;
 					if (characterName.Length > 16)
 					{
-						txtName.FontSize = 43;
-						txtName.Margin = new Thickness(txtName.Margin.Left, txtName.Margin.Top, txtName.Margin.Right, txtName.Margin.Bottom - 6);
+						txtName.FontSize = 46;
+						txtName.Margin = new Thickness(txtName.Margin.Left, txtName.Margin.Top, txtName.Margin.Right, txtName.Margin.Bottom - 4);
 					}
 					txtDescr.Text = description;
 					gridFrame.RenderTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
@@ -66,22 +66,72 @@ namespace AutoType.UserControls
 					gridLeftPlace.Margin = config.MarginForLeftPlace;
 				}
 			}
-			// режим новой рамки
 			else if (frameMode == FrameMode.New)
 			{
-				// высчитываем масштабирование, чтобы растянуть рамку до краёв скриншота
-				double horizontalScale = screen.Source.Width / imgFrameNew.Width;
 				if (isDialog)
 				{
 					gridNew.Visibility = Visibility.Visible;
-					// растягиваем рамку до краёв скрина
-					gridNew.RenderTransform = new ScaleTransform(horizontalScale, horizontalScale, imgFrameNew.Width / 2, imgFrameNew.Height);
+
 					// пробел - костыль, ибо слева обрезается обводка имени
 					txtNameNew.Text = " " + characterName;
 					if (characterName.Length > 16)
-
+					{
 						txtNameNew.FontSize = 43.3;
+						txtNameNew.Margin = new Thickness(0, 0, 1103.6, 275.4);
+
+					}
 					txtDescrNew.Text = description;
+
+					var scaleWidthFrame = imgFrameNew.Width * config.Scale;
+					// если скриншот меньше рамки со скейлом, то надо её сначала обрезать
+					if (screen.Source.Width < scaleWidthFrame)
+					{
+						var croppedHorizontalPart = (scaleWidthFrame - screen.Source.Width) / config.Scale;
+						var scaleHeightFrame = imgFrameNew.Height * config.Scale;
+						double croppedVerticalPart;
+						if (screen.Source.Height < scaleHeightFrame)
+						{
+							croppedVerticalPart = (scaleHeightFrame - screen.Source.Height) / config.Scale;
+						}
+						else
+							croppedVerticalPart = 0;
+						var image = new BitmapImage(new Uri("pack://application:,,,/resources/frame_new.png"));
+						imgFrameNew.Source = new CroppedBitmap(image, new Int32Rect((int)croppedHorizontalPart / 2,
+							(int)croppedVerticalPart, (int)(imgFrameNew.Width - croppedHorizontalPart),
+							(int)(imgFrameNew.Height - croppedVerticalPart)));
+						imgFrameNew.Width -= croppedHorizontalPart;
+						imgFrameNew.Height -= croppedVerticalPart;
+					}
+
+					gridNew.RenderTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameNew.Width / 2, imgFrameNew.Height);
+					// если скриншот больше рамки, то рамку надо растянуть
+					if (screen.Source.Width > imgFrameNew.Width * config.Scale)
+					{
+						// высчитываем масштабирование, чтобы растянуть рамку до краёв скриншота
+						double horizontalScale = screen.Source.Width / imgFrameNew.Width;
+						// растягиваем рамку до краёв скрина
+						gridNew.RenderTransform = new ScaleTransform(horizontalScale, horizontalScale, imgFrameNew.Width / 2, imgFrameNew.Height);
+					}
+				}
+
+				if (isLeftPlace)
+				{
+					gridLeftPlaceNew.Visibility = Visibility.Visible;
+					if (leftPlaceDescr is null || leftPlaceDescr.Length < 1)
+						throw new Exception("Некорректная разметка для места слева.");
+					else if (leftPlaceDescr.Length == 1)
+						txtLeftPlaceNew.Text = leftPlaceDescr[0];
+					// если составное место слева
+					else if (leftPlaceDescr.Length == 2)
+					{
+						txtLeftPlaceNew.Text = leftPlaceDescr[0] + " " + leftPlaceDescr[1];
+						spLeftPlaceNew.Visibility = Visibility.Visible;
+						txtSecondLeftPlaceNew.Text = leftPlaceDescr[0];
+					}
+
+					gridLeftPlaceNew.RenderTransform = new ScaleTransform(config.Scale, config.Scale, 0, 0);
+					//var num = mainGrid.Width - screen.Source.Width;
+					//gridLeftPlaceNew.Margin = new Thickness(400, 0, 0, 0);
 				}
 			}
 			DataContext = this;

@@ -18,7 +18,7 @@ public enum StrokePosition
 [ContentProperty("Text")]
 public class OutlinedTextBlock : FrameworkElement
 {
-	private void UpdatePen()
+	public void UpdatePen()
 	{
 		_Pen = new Pen(Stroke, StrokeThickness)
 		{
@@ -116,10 +116,20 @@ public class OutlinedTextBlock : FrameworkElement
 	  typeof(OutlinedTextBlock),
 	  new FrameworkPropertyMetadata(TextWrapping.NoWrap, OnFormattedTextUpdated));
 
-	private FormattedText _FormattedText;
-	private Geometry _TextGeometry;
-	private Pen _Pen;
-	private PathGeometry _clipGeometry;
+	public static readonly DependencyProperty LineHeightProperty = DependencyProperty.Register(
+	  "LineHeight",
+	  typeof(double),
+	  typeof(OutlinedTextBlock),
+	  new FrameworkPropertyMetadata(OnFormattedTextUpdated));
+
+	//public static readonly DependencyProperty PaddingProperty = TextElement.FontFamilyProperty.AddOwner(
+	//  typeof(OutlinedTextBlock),
+	//  new FrameworkPropertyMetadata(OnFormattedTextUpdated));
+
+	public FormattedText _FormattedText;
+	public Geometry _TextGeometry;
+	public Pen _Pen;
+	public PathGeometry _clipGeometry;
 
 	public Brush Fill
 	{
@@ -198,6 +208,12 @@ public class OutlinedTextBlock : FrameworkElement
 	{
 		get { return (TextWrapping)GetValue(TextWrappingProperty); }
 		set { SetValue(TextWrappingProperty, value); }
+	}
+
+	public double LineHeight
+	{
+		get { return (double)GetValue(LineHeightProperty); }
+		set { SetValue(LineHeightProperty, value); }
 	}
 
 	public OutlinedTextBlock()
@@ -283,7 +299,7 @@ public class OutlinedTextBlock : FrameworkElement
 		outlinedTextBlock.InvalidateVisual();
 	}
 
-	private void EnsureFormattedText()
+	public void EnsureFormattedText()
 	{
 		if (_FormattedText != null)
 		{
@@ -311,6 +327,7 @@ public class OutlinedTextBlock : FrameworkElement
 		_FormattedText.MaxLineCount = TextWrapping == TextWrapping.NoWrap ? 1 : int.MaxValue;
 		_FormattedText.TextAlignment = TextAlignment;
 		_FormattedText.Trimming = TextTrimming;
+		_FormattedText.LineHeight = LineHeight;
 
 		_FormattedText.SetFontSize(FontSize);
 		_FormattedText.SetFontStyle(FontStyle);
@@ -332,7 +349,10 @@ public class OutlinedTextBlock : FrameworkElement
 
 		if (StrokePosition == StrokePosition.Outside)
 		{
-			var boundsGeo = new RectangleGeometry(new Rect(0, 0, ActualWidth, ActualHeight));
+			var boundsGeo = new RectangleGeometry(new Rect(-(2 * StrokeThickness), -(2 * StrokeThickness), 
+				ActualWidth + (4 * StrokeThickness), ActualHeight + (4 * StrokeThickness)));
+
+			//var boundsGeo = new RectangleGeometry(new Rect(0, 0, ActualWidth, ActualHeight));
 			_clipGeometry = Geometry.Combine(boundsGeo, _TextGeometry, GeometryCombineMode.Exclude, null);
 		}
 	}
