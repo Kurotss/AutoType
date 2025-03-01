@@ -10,18 +10,20 @@
         Icon="Resources/icon.png">
     
     <Grid>
-        <!--<Grid.RowDefinitions>
-            <RowDefinition Height="70px"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>-->
-            <Viewbox Name="viewBox" VerticalAlignment="Top" HorizontalAlignment="Center"/>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="0.1"/>
+        </Grid.RowDefinitions>
+        <Viewbox Name="viewBox" VerticalAlignment="Top" HorizontalAlignment="Center"/>
             
-
-            <Button ToolTip="Сохранить и выйти?" Click="SaveAndCloseAction" Width="50" Height="50" Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Left"
-                VerticalAlignment="Top">
+        <Button ToolTip="Сохранить и выйти?" Click="SaveAndCloseAction" Width="50" Height="50" Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Left"
+            VerticalAlignment="Top">
             <Button.Content>
                 <Image Source="Resources/save.png"/>
             </Button.Content>
         </Button>
+
+        <ComboBox Name="cmbFrames" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed"
+                  ItemsSource="{Binding EditableElements}" SelectedItem="{Binding SelectedElement}"/>
     </Grid>
 </Window>

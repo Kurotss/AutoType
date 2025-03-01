@@ -29,6 +29,7 @@ namespace AutoType.UserControls
 			if (frameMode == FrameMode.Old)
 			{
 				gridOld.Visibility = Visibility.Visible;
+				// если скриншот с репликой
 				if (isDialog)
 				{
 					gridFrame.Visibility = Visibility.Visible;
@@ -46,7 +47,7 @@ namespace AutoType.UserControls
 				//
 				imgMenu.RenderTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
 				imgMenu.Margin = config.MarginForMenu;
-				// логика по тексту в левой рамке
+				// если скриншот с левой рамкой места
 				if (isLeftPlace)
 				{
 					gridLeftPlace.Visibility = Visibility.Visible;
@@ -83,12 +84,13 @@ namespace AutoType.UserControls
 					txtDescrNew.Text = description;
 
 					var scaleWidthFrame = imgFrameNew.Width * config.Scale;
-					// если скриншот меньше рамки со скейлом, то надо её сначала обрезать
+					// если ширина скриншота меньше рамки со скейлом, то надо её сначала обрезать
 					if (screen.Source.Width < scaleWidthFrame)
 					{
 						var croppedHorizontalPart = (scaleWidthFrame - screen.Source.Width) / config.Scale;
 						var scaleHeightFrame = imgFrameNew.Height * config.Scale;
 						double croppedVerticalPart;
+						// если высота скриншота меньше рамки со скейлом, то надо её и по высоте обрезать
 						if (screen.Source.Height < scaleHeightFrame)
 						{
 							croppedVerticalPart = (scaleHeightFrame - screen.Source.Height) / config.Scale;
@@ -105,7 +107,7 @@ namespace AutoType.UserControls
 
 					gridNew.RenderTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameNew.Width / 2, imgFrameNew.Height);
 					// если скриншот больше рамки, то рамку надо растянуть
-					if (screen.Source.Width > imgFrameNew.Width * config.Scale)
+					if (screen.Source.Width > scaleWidthFrame)
 					{
 						// высчитываем масштабирование, чтобы растянуть рамку до краёв скриншота
 						double horizontalScale = screen.Source.Width / imgFrameNew.Width;
@@ -130,8 +132,6 @@ namespace AutoType.UserControls
 					}
 
 					gridLeftPlaceNew.RenderTransform = new ScaleTransform(config.Scale, config.Scale, 0, 0);
-					//var num = mainGrid.Width - screen.Source.Width;
-					//gridLeftPlaceNew.Margin = new Thickness(400, 0, 0, 0);
 				}
 			}
 			DataContext = this;
