@@ -164,20 +164,10 @@ namespace AutoType.Classes
 
 		#region IsNotExistsConfiguration
 
-		private bool _isNotExistsConfiguration;
-
 		/// <summary>
 		/// Не определено никаких настроек: да/нет
 		/// </summary>
-		public bool IsNotExistsConfiguration => ConfigurationList.Count() < 1;
-		//{
-		//	get => _isNotExistsConfiguration;
-		//	set
-		//	{
-		//		_isNotExistsConfiguration = value;
-		//		OnPropertyChanged(nameof(IsNotExistsConfiguration));
-		//	}
-		//}
+		public bool IsNotExistsConfiguration => ConfigurationList.Count < 1;
 
 		#endregion
 

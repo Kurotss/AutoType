@@ -24,6 +24,7 @@
     <None Remove="Resources\ramka.png" />
     <None Remove="Resources\save.png" />
     <None Remove="Resources\sekai.ttf" />
+    <None Remove="Resources\пример.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -81,6 +82,9 @@
     <Resource Include="Resources\save.png" />
     <Resource Include="Resources\sekai.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\пример.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
 </Project>

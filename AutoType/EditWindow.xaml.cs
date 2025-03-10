@@ -1,6 +1,7 @@
 ﻿using AutoType.Classes;
 using AutoType.UserControls;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,27 +18,6 @@ namespace AutoType
 		{
 			InitializeComponent();
 
-			double width = userControl.Width, height = userControl.Height;
-			// если скриншот больше ширины монитора, то уменьшаем
-			if (userControl.Height > SystemParameters.PrimaryScreenHeight)
-			{
-				height = SystemParameters.PrimaryScreenHeight * 0.8;
-				width = userControl.Width * (SystemParameters.PrimaryScreenHeight * 0.8 / userControl.Height);
-			}
-
-			// если скриншот больше высоты монитора, то уменьшаем
-			if (width > SystemParameters.PrimaryScreenWidth)
-			{
-				width = SystemParameters.PrimaryScreenWidth * 0.8;
-				height *= (SystemParameters.PrimaryScreenWidth * 0.8 / width);
-			}
-
-			Item = userControl;
-			viewBox.Child = userControl;
-
-			viewBox.Height = height;
-			viewBox.Width = width;
-
 			// если это скрин с диалогом/местом слева/именем, то ему потребуется редактирование слоёв
 			if (userControl is TypeFrame typeFrame)
 			{
@@ -53,62 +33,99 @@ namespace AutoType
 				if (frameMode == FrameMode.Old)
 				{
 					if (typeFrame.gridFrame.Visibility == Visibility.Visible)
-					{
-						EditableElemets.Add(new("Реплика", typeFrame.txtDescr));
-						EditableElemets.Add(new("Имя", typeFrame.txtName));
-					}
+						EditableElements.Add(new("Реплика и имя", typeFrame.txtDescr));
 
 					if (typeFrame.gridLeftPlace.Visibility == Visibility.Visible)
-						EditableElemets.Add(new("Левая рамка", typeFrame.txtLeftPlace));
+						EditableElements.Add(new("Левая рамка", typeFrame.txtLeftPlace));
 				}
 
 				// если новая рамка
 				if (frameMode == FrameMode.New)
 				{
 					if (typeFrame.gridNew.Visibility == Visibility.Visible)
-					{
-						EditableElemets.Add(new("Реплика", typeFrame.txtDescrNew));
-						EditableElemets.Add(new("Имя", typeFrame.txtNameNew));
-					}
+						EditableElements.Add(new("Реплика и имя", typeFrame.gridNew));
 
 					if (typeFrame.gridLeftPlaceNew.Visibility == Visibility.Visible)
-						EditableElemets.Add(new("Левая рамка", typeFrame.txtLeftPlaceNew));
+					{
+						EditableElements.Add(new("Левая рамка", typeFrame.gridLeftPlaceNew));
+						IsComplexLeftPlace = typeFrame.txtTube.Visibility == Visibility.Visible;
+					}
 				}
 			}
 
-			if (EditableElemets.Count > 0)
+			if (EditableElements.Count > 0)
 			{
-				cmbFrames.Visibility = Visibility.Visible;
-				SelectedElement = EditableElemets.FirstOrDefault();
+				SelectedControl = EditableElements.FirstOrDefault();
+				spFrames.Visibility = Visibility.Visible;
 			}
+
+			double width = userControl.Width, height = userControl.Height;
+			// если скриншот больше ширины монитора, то уменьшаем
+			if (userControl.Height > SystemParameters.PrimaryScreenHeight)
+			{
+				height = SystemParameters.PrimaryScreenHeight * 0.8;
+				width = userControl.Width * (SystemParameters.PrimaryScreenHeight * 0.8 / userControl.Height);
+			}
+
+			// если скриншот больше высоты монитора, то уменьшаем
+			if (width > SystemParameters.PrimaryScreenWidth)
+			{
+				width = SystemParameters.PrimaryScreenWidth * 0.8;
+				height *= (SystemParameters.PrimaryScreenWidth * 0.8 / width);
+			}
+
+			viewBox.Child = userControl;
+
+			viewBox.Height = height;
+			viewBox.Width = width;
 
 			DataContext = this;
 		}
 
 		#region Properties
 
-		public UserControl Item { get; set; }
-
 		/// <summary>
 		/// Список элементов, которые можно отредактировать в скрине
 		/// </summary>
-		public List<KeyValuePair<string, FrameworkElement>> EditableElemets { get; set; } = new();
+		public ObservableCollection<KeyValuePair<string, FrameworkElement>> EditableElements { get; set; } = new();
 
 		/// <summary>
 		/// Выбранный элемент для редактирования
 		/// </summary>
-		private KeyValuePair<string, FrameworkElement>? _selectedElement;
-		public KeyValuePair<string, FrameworkElement>? SelectedElement
+		private KeyValuePair<string, FrameworkElement>? _selectedControl;
+		public KeyValuePair<string, FrameworkElement>? SelectedControl
 		{
-			get => _selectedElement;
+			get => _selectedControl;
 			set
 			{
 				// если элемент поменялся, то выставляем новый элемент на передний план
 				if (value is not null)
 				{
-					Canvas.SetZIndex(value.Value.Value, 0);
-					Canvas.SetZIndex(_selectedElement.Value.Value, 1);
-					_selectedElement = value;
+					Panel.SetZIndex(value.Value.Value, 1);
+					if (_selectedControl is not null)
+						Panel.SetZIndex(_selectedControl.Value.Value, 0);
+					_selectedControl = value;
+					cbLeftPlace.Visibility = _selectedControl.Value.Key == "Левая рамка" ? Visibility.Visible: Visibility.Collapsed;
+				}
+			}
+		}
+
+
+
+		/// <summary>
+		/// Составная ли это рамка левого места
+		/// </summary>
+		private bool _isComplexLeftPlace;
+		public bool IsComplexLeftPlace
+		{
+			get => _isComplexLeftPlace;
+			set
+			{
+				_isComplexLeftPlace = value;
+				if (viewBox.Child is TypeFrame typeFrame)
+				{
+					typeFrame.txtTube.Visibility = IsComplexLeftPlace ? Visibility.Visible : Visibility.Collapsed;
+					typeFrame.txtSecondLeftPlaceNew.Visibility = IsComplexLeftPlace ? Visibility.Visible : Visibility.Collapsed;
 				}
 			}
 		}

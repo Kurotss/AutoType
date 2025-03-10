@@ -24,11 +24,9 @@ namespace AutoType
 			string url = "https://drive.google.com/uc?export=download&id=1v8R-pdOtLQ19eG3doc9XVjJlsZxpElKd";
 			try
 			{
-				using (WebClient client = new())
-				{
-					client.DownloadFileCompleted += client_DownloadFileCompleted;
-					client.DownloadFileTaskAsync(url, Path);
-				}
+				using WebClient client = new();
+				client.DownloadFileCompleted += client_DownloadFileCompleted;
+				client.DownloadFileTaskAsync(url, Path);
 			}
 			catch (Exception e)
 			{

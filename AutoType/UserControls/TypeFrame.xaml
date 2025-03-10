@@ -10,6 +10,7 @@
     </UserControl.Resources>
     <Grid x:Name="mainGrid">
         <Image Name="screen" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        <Image Source="../Resources/пример.png" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
         <Grid Name="gridOld" Visibility="Collapsed">
             <Image Name="imgMenu" Source="../Resources/menu.png" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="2335" Height="1080"/>
             <Grid Name="gridLeftPlace" HorizontalAlignment="Center" VerticalAlignment="Bottom" Visibility="Collapsed">
@@ -33,22 +34,20 @@
             </Grid>
         </Grid>
         <Grid Name="gridLeftPlaceNew" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed">
-            <Image Name="imgLeftPlaceNew" Source="../Resources/left_place_new.png" Width="2400" Height="1800" HorizontalAlignment="Left" VerticalAlignment="Top"/>
+            <Image Name="imgLeftPlaceNew" Source="../Resources/left_place_new.png" Width="2400" Height="1080" HorizontalAlignment="Left" VerticalAlignment="Top"/>
 
-            <StackPanel Name="spLeftPlaceNew" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="33 43 0 0"
-                  Orientation="Horizontal" Visibility="Collapsed">
+            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="33 43 0 0" Orientation="Horizontal">
+                <TextBox Name="txtLeftPlaceNew" FontSize="26.25pt" FontFamily="../Resources/#Etelka Pro"
+                    Background="Transparent" BorderThickness="0" Foreground="White"/>
+                <TextBox Name="txtTube" Text="|" FontSize="26.25pt" FontFamily="../Resources/#Etelka Pro"
+                    Foreground="White" Background="Transparent" BorderThickness="0" Margin="-4 -3.5 4 0" Visibility="Collapsed"/>
                 <TextBox Name="txtSecondLeftPlaceNew" FontSize="26.25pt" FontFamily="../Resources/#Etelka Pro"
-                    Background="Transparent" BorderThickness="0" Foreground="Transparent"/>
-                <TextBox Text="|" FontSize="26.25pt" FontFamily="../Resources/#Etelka Pro"
-                    Foreground="White" Background="Transparent" BorderThickness="0" Margin="-4 -3.5 0 0"/>
+                    Background="Transparent" BorderThickness="0" Foreground="White"/>
             </StackPanel>
-
-            <TextBox Name="txtLeftPlaceNew" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Background="Transparent"
-                     BorderThickness="0" FontSize="26.25pt" Margin="33 43 0 0" FontFamily="../Resources/#Etelka Pro"/>
         </Grid>
         <Grid Name="gridNew" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
             <Image Name="imgFrameNew" Source="../Resources/frame_new.png" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="2334" Height="1080"/>
-            <classes:OutlinedTextBlock  x:Name="txtNameNew" Fill="#fffdfe" FontSize="42.00pt" Width="565" Margin="0 0 1116.3 271.2"
+            <classes:OutlinedTextBox  x:Name="txtNameNew" Fill="#fffdfe" FontSize="42.00pt" Width="565" Margin="0 0 1116.3 271.2" 
                 FontFamily="../Resources/#Sekai Untitled medium" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Left" 
                 StrokeThickness="6.8" Stroke="#555474" StrokePosition="Outside" xml:space="preserve"/>
             <classes:OutlinedTextBox x:Name="txtDescrNew" Fill="#fffeff" FontSize="31.85pt" Height="250" Width="1598" LineHeight="49" TextWrapping="Wrap"
@@ -58,5 +57,8 @@
 
         <TextBlock Text="Нажмите esc, чтобы выйти из режима редактирования" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="40" FontWeight="Bold" Foreground="Red"
                    Margin="0 0 0 -50" Visibility="{Binding ElementName=txtDescrNew, Path=IsInEditMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+        <TextBlock Text="Нажмите esc, чтобы выйти из режима редактирования" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="40" FontWeight="Bold" Foreground="Red"
+                  Margin="0 0 0 -50" Visibility="{Binding ElementName=txtNameNew, Path=IsInEditMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
     </Grid>
 </UserControl>

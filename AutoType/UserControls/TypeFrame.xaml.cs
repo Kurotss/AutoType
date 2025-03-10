@@ -121,14 +121,12 @@ namespace AutoType.UserControls
 					gridLeftPlaceNew.Visibility = Visibility.Visible;
 					if (leftPlaceDescr is null || leftPlaceDescr.Length < 1)
 						throw new Exception("Некорректная разметка для места слева.");
-					else if (leftPlaceDescr.Length == 1)
-						txtLeftPlaceNew.Text = leftPlaceDescr[0];
+					txtLeftPlaceNew.Text = leftPlaceDescr[0];
 					// если составное место слева
-					else if (leftPlaceDescr.Length == 2)
+					if (leftPlaceDescr.Length == 2)
 					{
-						txtLeftPlaceNew.Text = leftPlaceDescr[0] + " " + leftPlaceDescr[1];
-						spLeftPlaceNew.Visibility = Visibility.Visible;
-						txtSecondLeftPlaceNew.Text = leftPlaceDescr[0];
+						txtTube.Visibility = Visibility.Visible;
+						txtSecondLeftPlaceNew.Text = leftPlaceDescr[1];
 					}
 
 					gridLeftPlaceNew.RenderTransform = new ScaleTransform(config.Scale, config.Scale, 0, 0);

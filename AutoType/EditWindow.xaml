@@ -7,15 +7,16 @@
         Title="EditWindow"
         WindowStartupLocation="CenterScreen" WindowState="Maximized"
         Closing="WindowClosing"
-        Icon="Resources/icon.png">
-    
-    <Grid>
+        Icon="Resources/icon.png"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+
+    <Grid >
         <Grid.RowDefinitions>
             <RowDefinition/>
-            <RowDefinition Height="0.1"/>
+            <RowDefinition Height="0.1*"/>
         </Grid.RowDefinitions>
         <Viewbox Name="viewBox" VerticalAlignment="Top" HorizontalAlignment="Center"/>
-            
+
         <Button ToolTip="Сохранить и выйти?" Click="SaveAndCloseAction" Width="50" Height="50" Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Left"
             VerticalAlignment="Top">
             <Button.Content>
@@ -23,7 +24,17 @@
             </Button.Content>
         </Button>
 
-        <ComboBox Name="cmbFrames" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed"
-                  ItemsSource="{Binding EditableElements}" SelectedItem="{Binding SelectedElement}"/>
+        <StackPanel Name="spFrames" VerticalAlignment="Top" HorizontalAlignment="Center" Visibility="Collapsed" Grid.Row="1" Orientation="Horizontal">
+            <TextBlock Text="Выбранный слой" FontSize="30" Margin="0 0 10 0"/>
+            <ComboBox Name="cmbFrames" Width="200" Height="40" FontSize="25"
+                  ItemsSource="{Binding EditableElements}" SelectedItem="{Binding SelectedControl, Mode=TwoWay}" DisplayMemberPath="Key"/>
+
+            <CheckBox Name="cbLeftPlace" Content="Составная рамка (с '|')" IsChecked="{Binding IsComplexLeftPlace}" Margin="10 0 0 0">
+                <CheckBox.LayoutTransform>
+                    <ScaleTransform ScaleX="2.5" ScaleY="2.5" />
+                </CheckBox.LayoutTransform>
+            </CheckBox>
+
+        </StackPanel>
     </Grid>
 </Window>
