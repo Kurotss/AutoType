@@ -12,7 +12,7 @@ namespace AutoType.UserControls
 	/// </summary>
 	public partial class TypeFrame : UserControl
 	{
-		public TypeFrame(string characterName, string description, Configuration config, FrameMode frameMode, BitmapImage source, double? CroppedWidth, double? CroppedHeight,
+		public TypeFrame(string characterName, string description, Configuration config, BitmapImage source, double? CroppedWidth, double? CroppedHeight,
 			bool isDialog, bool isLeftPlace, string[]? leftPlaceDescr = null)
 		{
 			InitializeComponent();
@@ -26,7 +26,7 @@ namespace AutoType.UserControls
 			Height = screen.Source.Height;
 			Width = screen.Source.Width;
 			// режим старой рамки
-			if (frameMode == FrameMode.Old)
+			if (config.FrameMode == FrameMode.Old)
 			{
 				gridOld.Visibility = Visibility.Visible;
 				// если скриншот с репликой
@@ -41,11 +41,11 @@ namespace AutoType.UserControls
 						txtName.Margin = new Thickness(txtName.Margin.Left, txtName.Margin.Top, txtName.Margin.Right, txtName.Margin.Bottom - 4);
 					}
 					txtDescr.Text = description;
-					gridFrame.RenderTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
+					gridFrame.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
 					gridFrame.Margin = config.MarginForDialog;
 				}
 				//
-				imgMenu.RenderTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
+				imgMenu.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
 				imgMenu.Margin = config.MarginForMenu;
 				// если скриншот с левой рамкой места
 				if (isLeftPlace)
@@ -63,11 +63,11 @@ namespace AutoType.UserControls
 						txtSecondLeftPlace.Text = leftPlaceDescr[0];
 					}
 
-					gridLeftPlace.RenderTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
+					gridLeftPlace.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
 					gridLeftPlace.Margin = config.MarginForLeftPlace;
 				}
 			}
-			else if (frameMode == FrameMode.New)
+			else if (config.FrameMode == FrameMode.New)
 			{
 				if (isDialog)
 				{
@@ -105,14 +105,14 @@ namespace AutoType.UserControls
 						imgFrameNew.Height -= croppedVerticalPart;
 					}
 
-					gridNew.RenderTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameNew.Width / 2, imgFrameNew.Height);
+					gridNew.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameNew.Width / 2, imgFrameNew.Height);
 					// если скриншот больше рамки, то рамку надо растянуть
 					if (screen.Source.Width > scaleWidthFrame)
 					{
 						// высчитываем масштабирование, чтобы растянуть рамку до краёв скриншота
 						double horizontalScale = screen.Source.Width / imgFrameNew.Width;
 						// растягиваем рамку до краёв скрина
-						gridNew.RenderTransform = new ScaleTransform(horizontalScale, horizontalScale, imgFrameNew.Width / 2, imgFrameNew.Height);
+						gridNew.LayoutTransform = new ScaleTransform(horizontalScale, horizontalScale, imgFrameNew.Width / 2, imgFrameNew.Height);
 					}
 				}
 
@@ -129,7 +129,7 @@ namespace AutoType.UserControls
 						txtSecondLeftPlaceNew.Text = leftPlaceDescr[1];
 					}
 
-					gridLeftPlaceNew.RenderTransform = new ScaleTransform(config.Scale, config.Scale, 0, 0);
+					gridLeftPlaceNew.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, 0, 0);
 				}
 			}
 			DataContext = this;

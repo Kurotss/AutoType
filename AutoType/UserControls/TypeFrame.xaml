@@ -10,7 +10,7 @@
     </UserControl.Resources>
     <Grid x:Name="mainGrid">
         <Image Name="screen" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
-        <Image Source="../Resources/пример.png" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+        <!--<Image Source="../Resources/пример.png" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>-->
         <Grid Name="gridOld" Visibility="Collapsed">
             <Image Name="imgMenu" Source="../Resources/menu.png" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="2335" Height="1080"/>
             <Grid Name="gridLeftPlace" HorizontalAlignment="Center" VerticalAlignment="Bottom" Visibility="Collapsed">

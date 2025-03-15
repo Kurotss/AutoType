@@ -11,6 +11,7 @@
     </UserControl.Resources>
     <Grid>
         <Image Name="screen" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        <!--<Image Source="../Resources/образец.png" HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
         <Grid Name="gridOld" Visibility="Collapsed">
             <Image Name="imgMenu" Source="../Resources/menu.png" Width="2335" Height="1080" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
             <Grid Name="gridPlace" HorizontalAlignment="Center" VerticalAlignment="Center">

@@ -18,6 +18,9 @@ namespace AutoType
 		{
 			InitializeComponent();
 
+			ObservableCollection<KeyValuePair<string, FrameworkElement>> editableElements = new();
+			bool isComplexLeftPlace = false;
+
 			// если это скрин с диалогом/местом слева/именем, то ему потребуется редактирование слоёв
 			if (userControl is TypeFrame typeFrame)
 			{
@@ -33,104 +36,30 @@ namespace AutoType
 				if (frameMode == FrameMode.Old)
 				{
 					if (typeFrame.gridFrame.Visibility == Visibility.Visible)
-						EditableElements.Add(new("Реплика и имя", typeFrame.txtDescr));
+						editableElements.Add(new("Реплика и имя", typeFrame.txtDescr));
 
 					if (typeFrame.gridLeftPlace.Visibility == Visibility.Visible)
-						EditableElements.Add(new("Левая рамка", typeFrame.txtLeftPlace));
+						editableElements.Add(new("Левая рамка", typeFrame.txtLeftPlace));
 				}
 
 				// если новая рамка
 				if (frameMode == FrameMode.New)
 				{
 					if (typeFrame.gridNew.Visibility == Visibility.Visible)
-						EditableElements.Add(new("Реплика и имя", typeFrame.gridNew));
+						editableElements.Add(new("Реплика и имя", typeFrame.gridNew));
 
 					if (typeFrame.gridLeftPlaceNew.Visibility == Visibility.Visible)
 					{
-						EditableElements.Add(new("Левая рамка", typeFrame.gridLeftPlaceNew));
-						IsComplexLeftPlace = typeFrame.txtTube.Visibility == Visibility.Visible;
+						editableElements.Add(new("Левая рамка", typeFrame.gridLeftPlaceNew));
+						isComplexLeftPlace = typeFrame.txtTube.Visibility == Visibility.Visible;
 					}
 				}
 			}
 
-			if (EditableElements.Count > 0)
-			{
-				SelectedControl = EditableElements.FirstOrDefault();
-				spFrames.Visibility = Visibility.Visible;
-			}
-
-			double width = userControl.Width, height = userControl.Height;
-			// если скриншот больше ширины монитора, то уменьшаем
-			if (userControl.Height > SystemParameters.PrimaryScreenHeight)
-			{
-				height = SystemParameters.PrimaryScreenHeight * 0.8;
-				width = userControl.Width * (SystemParameters.PrimaryScreenHeight * 0.8 / userControl.Height);
-			}
-
-			// если скриншот больше высоты монитора, то уменьшаем
-			if (width > SystemParameters.PrimaryScreenWidth)
-			{
-				width = SystemParameters.PrimaryScreenWidth * 0.8;
-				height *= (SystemParameters.PrimaryScreenWidth * 0.8 / width);
-			}
-
 			viewBox.Child = userControl;
 
-			viewBox.Height = height;
-			viewBox.Width = width;
-
-			DataContext = this;
+			DataContext = new EditWindowModel(userControl, editableElements, isComplexLeftPlace);
 		}
-
-		#region Properties
-
-		/// <summary>
-		/// Список элементов, которые можно отредактировать в скрине
-		/// </summary>
-		public ObservableCollection<KeyValuePair<string, FrameworkElement>> EditableElements { get; set; } = new();
-
-		/// <summary>
-		/// Выбранный элемент для редактирования
-		/// </summary>
-		private KeyValuePair<string, FrameworkElement>? _selectedControl;
-		public KeyValuePair<string, FrameworkElement>? SelectedControl
-		{
-			get => _selectedControl;
-			set
-			{
-				// если элемент поменялся, то выставляем новый элемент на передний план
-				if (value is not null)
-				{
-					Panel.SetZIndex(value.Value.Value, 1);
-					if (_selectedControl is not null)
-						Panel.SetZIndex(_selectedControl.Value.Value, 0);
-					_selectedControl = value;
-					cbLeftPlace.Visibility = _selectedControl.Value.Key == "Левая рамка" ? Visibility.Visible: Visibility.Collapsed;
-				}
-			}
-		}
-
-
-
-		/// <summary>
-		/// Составная ли это рамка левого места
-		/// </summary>
-		private bool _isComplexLeftPlace;
-		public bool IsComplexLeftPlace
-		{
-			get => _isComplexLeftPlace;
-			set
-			{
-				_isComplexLeftPlace = value;
-				if (viewBox.Child is TypeFrame typeFrame)
-				{
-					typeFrame.txtTube.Visibility = IsComplexLeftPlace ? Visibility.Visible : Visibility.Collapsed;
-					typeFrame.txtSecondLeftPlaceNew.Visibility = IsComplexLeftPlace ? Visibility.Visible : Visibility.Collapsed;
-				}
-			}
-		}
-
-		#endregion
 
 		#region Methods
 

@@ -680,7 +680,7 @@ namespace AutoType.Classes
 									}
 								case FileTypes.Left:
 									{
-										typeScreen.UserControl = new TypeFrame(string.Empty, string.Empty, CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource, CroppedWidth, CroppedHeight, false, true,
+										typeScreen.UserControl = new TypeFrame(string.Empty, string.Empty, CurrentConfig ?? new Configuration(), typeScreen.FileSource, CroppedWidth, CroppedHeight, false, true,
 											line.Split("|"));
 										break;
 									}
@@ -693,7 +693,7 @@ namespace AutoType.Classes
 											IsEditMode = false;
 											return;
 										}
-										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource, CroppedWidth, CroppedHeight, true, false);
+										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen.FileSource, CroppedWidth, CroppedHeight, true, false);
 										break;
 									}
 								case FileTypes.None:
@@ -708,7 +708,7 @@ namespace AutoType.Classes
 											IsEditMode = false;
 											return;
 										}
-										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), FrameMode, typeScreen.FileSource, CroppedWidth, CroppedHeight, true, true,
+										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen.FileSource, CroppedWidth, CroppedHeight, true, true,
 											line.Split("|"));
 										break;
 									}
@@ -980,6 +980,7 @@ namespace AutoType.Classes
 		{
 			var bi = new BitmapImage();
 			Bitmap bmp = ToImage(bytes);
+			bmp.SetResolution(96, 96); // устанавливаем стандартное разрешение, чтобы изображение не менялось в размерах
 			using (var ms = new MemoryStream())
 			{
 				ImageCodecInfo myImageCodecInfo;

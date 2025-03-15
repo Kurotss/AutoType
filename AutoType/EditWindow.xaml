@@ -8,28 +8,37 @@
         WindowStartupLocation="CenterScreen" WindowState="Maximized"
         Closing="WindowClosing"
         Icon="Resources/icon.png"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}">
+        xmlns:classes="clr-namespace:AutoType.Classes" 
+        d:DataContext="{d:DesignInstance Type=classes:EditWindowModel}">
+    <Window.Resources>
+        <classes:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter"/>
+        <classes:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Window.Resources>
 
     <Grid >
         <Grid.RowDefinitions>
             <RowDefinition/>
             <RowDefinition Height="0.1*"/>
         </Grid.RowDefinitions>
-        <Viewbox Name="viewBox" VerticalAlignment="Top" HorizontalAlignment="Center"/>
+        <Viewbox Name="viewBox" VerticalAlignment="Top" HorizontalAlignment="Center" />
 
-        <Button ToolTip="Сохранить и выйти?" Click="SaveAndCloseAction" Width="50" Height="50" Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Left"
+        <Button ToolTip="Сохранить и выйти?" Click="SaveAndCloseAction" Width="50" Height="50" Background="Transparent" BorderBrush="Transparent" HorizontalAlignment="Right"
             VerticalAlignment="Top">
             <Button.Content>
                 <Image Source="Resources/save.png"/>
             </Button.Content>
         </Button>
 
-        <StackPanel Name="spFrames" VerticalAlignment="Top" HorizontalAlignment="Center" Visibility="Collapsed" Grid.Row="1" Orientation="Horizontal">
+        <StackPanel Name="spFrames" VerticalAlignment="Top" HorizontalAlignment="Center" 
+                    Visibility="{Binding SelectedControl, Converter={StaticResource ObjectToVisibilityConverter}}"
+                    Grid.Row="1" Orientation="Horizontal"
+                    Margin="0 5 0 0">
             <TextBlock Text="Выбранный слой" FontSize="30" Margin="0 0 10 0"/>
             <ComboBox Name="cmbFrames" Width="200" Height="40" FontSize="25"
                   ItemsSource="{Binding EditableElements}" SelectedItem="{Binding SelectedControl, Mode=TwoWay}" DisplayMemberPath="Key"/>
 
-            <CheckBox Name="cbLeftPlace" Content="Составная рамка (с '|')" IsChecked="{Binding IsComplexLeftPlace}" Margin="10 0 0 0">
+            <CheckBox Name="cbLeftPlace" Content="Составная рамка (с '|')" IsChecked="{Binding IsComplexLeftPlace}" Margin="10 0 0 0"
+                      Visibility="{Binding IsLeftPlace, Converter={StaticResource BoolToVisibilityConverter}}">
                 <CheckBox.LayoutTransform>
                     <ScaleTransform ScaleX="2.5" ScaleY="2.5" />
                 </CheckBox.LayoutTransform>
