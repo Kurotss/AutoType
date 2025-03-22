@@ -29,21 +29,12 @@
             </Button.Content>
         </Button>
 
-        <StackPanel Name="spFrames" VerticalAlignment="Top" HorizontalAlignment="Center" 
-                    Visibility="{Binding SelectedControl, Converter={StaticResource ObjectToVisibilityConverter}}"
-                    Grid.Row="1" Orientation="Horizontal"
-                    Margin="0 5 0 0">
-            <TextBlock Text="Выбранный слой" FontSize="30" Margin="0 0 10 0"/>
-            <ComboBox Name="cmbFrames" Width="200" Height="40" FontSize="25"
-                  ItemsSource="{Binding EditableElements}" SelectedItem="{Binding SelectedControl, Mode=TwoWay}" DisplayMemberPath="Key"/>
-
-            <CheckBox Name="cbLeftPlace" Content="Составная рамка (с '|')" IsChecked="{Binding IsComplexLeftPlace}" Margin="10 0 0 0"
+        <CheckBox Name="cbLeftPlace" Content="Составная рамка (с '|')" IsChecked="{Binding IsComplexLeftPlace}"
+                      VerticalAlignment="Center" HorizontalAlignment="Center" Grid.Row="1"
                       Visibility="{Binding IsLeftPlace, Converter={StaticResource BoolToVisibilityConverter}}">
-                <CheckBox.LayoutTransform>
-                    <ScaleTransform ScaleX="2.5" ScaleY="2.5" />
-                </CheckBox.LayoutTransform>
-            </CheckBox>
-
-        </StackPanel>
+            <CheckBox.LayoutTransform>
+                <ScaleTransform ScaleX="2.5" ScaleY="2.5" />
+            </CheckBox.LayoutTransform>
+        </CheckBox>
     </Grid>
 </Window>

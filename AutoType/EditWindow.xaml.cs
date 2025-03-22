@@ -1,10 +1,12 @@
 ﻿using AutoType.Classes;
 using AutoType.UserControls;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Xml.Linq;
 using Window = System.Windows.Window;
 
 namespace AutoType
@@ -17,53 +19,43 @@ namespace AutoType
 		public EditWindow(UserControl userControl)
 		{
 			InitializeComponent();
-
-			ObservableCollection<KeyValuePair<string, FrameworkElement>> editableElements = new();
-			bool isComplexLeftPlace = false;
+			bool isComplexLeftPlace = false, isLeftPlace = false;
+			FrameMode frameMode = FrameMode.Old;
 
 			// если это скрин с диалогом/местом слева/именем, то ему потребуется редактирование слоёв
 			if (userControl is TypeFrame typeFrame)
 			{
-				FrameMode frameMode;
-				// определяем тип рамки (старая, новая) по гриду
-				if (typeFrame.gridOld.Visibility == Visibility.Visible)
-					frameMode = FrameMode.Old;
-				else
-					frameMode = FrameMode.New;
+				//var gridLeftPlace = typeFrame.FindName("gridLeftPlace") as Grid;
+				//var gridLeftPlaceNew = typeFrame.FindName("gridLeftPlaceNew") as Grid;
+				//var txtTubeOld = typeFrame.FindName("txtTubeOld") as TextBox;
+				//var txtTube = typeFrame.FindName("txtTube") as TextBox;
 
-				// наполняем комбобокс типами файлов для редактирования
-				// если старая рамка
-				if (frameMode == FrameMode.Old)
-				{
-					if (typeFrame.gridFrame.Visibility == Visibility.Visible)
-						editableElements.Add(new("Реплика и имя", typeFrame.txtDescr));
 
-					if (typeFrame.gridLeftPlace.Visibility == Visibility.Visible)
-						editableElements.Add(new("Левая рамка", typeFrame.txtLeftPlace));
-				}
-
-				// если новая рамка
-				if (frameMode == FrameMode.New)
-				{
-					if (typeFrame.gridNew.Visibility == Visibility.Visible)
-						editableElements.Add(new("Реплика и имя", typeFrame.gridNew));
-
-					if (typeFrame.gridLeftPlaceNew.Visibility == Visibility.Visible)
-					{
-						editableElements.Add(new("Левая рамка", typeFrame.gridLeftPlaceNew));
-						isComplexLeftPlace = typeFrame.txtTube.Visibility == Visibility.Visible;
-					}
-				}
+				//if (gridLeftPlace.Visibility == Visibility.Visible ||
+				//	gridLeftPlaceNew.Visibility == Visibility.Visible)
+				//{
+				//	isLeftPlace = true;
+				//	if (gridLeftPlace.Visibility == Visibility.Visible)
+				//	{
+				//		frameMode = FrameMode.Old;
+				//		isComplexLeftPlace = txtTubeOld.Visibility == Visibility.Visible;
+				//	}
+				//	if (gridLeftPlaceNew.Visibility == Visibility.Visible)
+				//	{
+				//		frameMode = FrameMode.New;
+				//		isComplexLeftPlace = txtTube.Visibility == Visibility.Visible;
+				//	}
+				//}
 			}
 
 			viewBox.Child = userControl;
 
-			DataContext = new EditWindowModel(userControl, editableElements, isComplexLeftPlace);
+			DataContext = new EditWindowModel(userControl, false, false, frameMode);
 		}
 
 		#region Methods
 
-		public System.Action SaveAndClose;
+		public Action SaveAndClose;
 
 		private void SaveAndCloseAction(object sender, RoutedEventArgs e)
 		{

@@ -6,7 +6,7 @@
     <DataTemplate x:Key="ConfigurationFrameTemplate" DataType="{x:Type configurationFrame:ConfigurationFrameModel}">
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="0.55*"/>
+                <RowDefinition Height="0.6*"/>
                 <RowDefinition Height="0.4*"/>
             </Grid.RowDefinitions>
             

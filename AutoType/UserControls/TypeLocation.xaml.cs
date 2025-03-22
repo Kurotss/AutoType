@@ -1,5 +1,4 @@
 ﻿using AutoType.Classes;
-using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -13,15 +12,14 @@ namespace AutoType.UserControls
 	/// </summary>
 	public partial class TypeLocation : UserControl
 	{
-		public TypeLocation(string place, bool isPlace, Configuration config, BitmapImage source, double? CroppedWidth, double? CroppedHeight)
+		public TypeLocation() { }
+
+		public TypeLocation(string place, FileTypes fileType, Configuration config, CroppedBitmap source, string note = null)
 		{
 			InitializeComponent();
-			// если не указаны параметры по обрезке скринов, то устанавливаем исходные скрины
-			if (CroppedWidth == null || CroppedHeight == null)
-				screen.Source = source;
-			else
-				screen.Source = new CroppedBitmap(source, new Int32Rect((int)(source.Width - CroppedWidth) / 2, (int)(source.Height - CroppedHeight) / 2, (int)CroppedWidth, (int)CroppedHeight));
+			Tag = config.FrameMode;
 			// устанавливаем размеры контроля под размеры обрезанного скриншота
+			screen.Source = source;
 			Height = screen.Source.Height;
 			Width = screen.Source.Width;
 			// режим старой рамки
@@ -31,7 +29,7 @@ namespace AutoType.UserControls
 				//
 				gridOld.Visibility = Visibility.Visible;
 				//
-				if (!isPlace)
+				if (fileType == FileTypes.Menu)
 					gridPlace.Visibility = Visibility.Collapsed;
 				//
 				gridPlace.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, 1167.5, 540);
@@ -47,6 +45,15 @@ namespace AutoType.UserControls
 				txtPlaceNew.Text = place;
 				gridNew.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgPlaceNew.Width / 2, imgPlaceNew.Height / 2);
 			}
+
+			if (fileType == FileTypes.PlaceAndNote)
+			{
+				txtNote.Visibility = Visibility.Visible;
+				txtNote.Text = note;
+				txtNote.Width = (Width - 200) / config.Scale; // устанавливаем ширину примечание, чтобы не заползало на меню
+				txtNote.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, 0, 0);
+			}
+
 			DataContext = this;
 		}
 	}

@@ -41,6 +41,7 @@ namespace EditBlockTest
             _textBox.Background = Brushes.Transparent;
             _textBox.TextWrapping = _textBlock.TextWrapping;
             _textBox.FontFamily = _textBlock.FontFamily;
+            _textBox.MaxLines = 999;
             _collection.Add(_textBox);
         }
 

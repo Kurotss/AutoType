@@ -5,10 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -45,7 +43,6 @@ namespace AutoType.Classes
 				}
 				OnPropertyChanged(nameof(IsNotExistsConfiguration));
 				OnPropertyChanged(nameof(ConfigurationList));
-				//}
 			}
 			catch (Exception e)
 			{
@@ -59,10 +56,10 @@ namespace AutoType.Classes
 
 		#region Images
 
-		private ObservableCollection<TypeScreen> _images;
+		private ObservableCollection<TypeScreen> _images = new ObservableCollection<TypeScreen>();
 
 		/// <summary>
-		/// Коллекция с объектами с инфорацией по скриншотам
+		/// Коллекция с объектами с информацией по скриншотам
 		/// </summary>
 		public ObservableCollection<TypeScreen> Images
 		{
@@ -427,7 +424,7 @@ namespace AutoType.Classes
 					if (string.IsNullOrEmpty(Prefix))
 					{
 						string[] fileNames = dialog.SelectedPath.Split('\\');
-						Prefix = fileNames[fileNames.Length - 1];
+						Prefix = fileNames[^1];
 					}
 				}
 				catch (Exception e)
@@ -457,7 +454,7 @@ namespace AutoType.Classes
 						// конвертируем в формат BitmapImage, чтобы можно было его подсунуть как источник для контроля Image
 						ImageConverter converter = new();
 						byte[] data = (byte[])converter.ConvertTo(image, typeof(byte[]));
-						var screen = CreateSource(data, Path.GetExtension(fileName));
+						var screen = data.CreateSource(Path.GetExtension(fileName));
 
 						// определяем тип скриншота
 						FileTypes fileType = FileTypes.Dialog;
@@ -465,12 +462,16 @@ namespace AutoType.Classes
 							fileType = FileTypes.None;
 						else if (fileName.Contains("menu"))
 							fileType = FileTypes.Menu;
+						else if (fileName.Contains("place_and_note"))
+							fileType = FileTypes.PlaceAndNote;
 						else if (fileName.Contains("place"))
 							fileType = FileTypes.Place;
 						else if (fileName.Contains("left_and_dialog"))
 							fileType = FileTypes.LeftAndDialog;
 						else if (fileName.Contains("left"))
 							fileType = FileTypes.Left;
+						else if (fileName.Contains("note"))
+							fileType = FileTypes.Note;
 						// создаём объект, где будут храниться данные по одному скриншоту: контроль для редактирования, результат режим и т.д.
 						var item = new TypeScreen()
 						{
@@ -572,7 +573,7 @@ namespace AutoType.Classes
 			// Проверка на равное количество строк текста и скриншотов с текстом
 			int stringCnt = AllText.Where(item => !string.IsNullOrEmpty(item)).Count();
 			int filesCnt = Images.Where(item => item.Type == FileTypes.Place || item.Type == FileTypes.Dialog || item.Type == FileTypes.Left).Count();
-			filesCnt += Images.Where(item => item.Type == FileTypes.LeftAndDialog).Count() * 2;
+			filesCnt += Images.Where(item => item.Type == FileTypes.LeftAndDialog || item.Type == FileTypes.Note || item.Type == FileTypes.PlaceAndNote).Count() * 2;
 			if (stringCnt != filesCnt)
 			{
 				MessageBox.Show($"Количество скриншотов ({filesCnt}) не соотвествует количеству строк текста ({stringCnt}). Проверьте и выберите папку со скриншотами или файл с текстом заново.");
@@ -661,27 +662,36 @@ namespace AutoType.Classes
 							// переменная с текстом для скриншота
 							string line = string.Empty;
 							// пропускаем пустые строки и ищем следующую строку с текстом
-							if (typeScreen.Type == FileTypes.Place || typeScreen.Type == FileTypes.Dialog || typeScreen.Type == FileTypes.Left || typeScreen.Type == FileTypes.LeftAndDialog)
+							if (typeScreen.Type == FileTypes.Place || typeScreen.Type == FileTypes.Dialog || typeScreen.Type == FileTypes.Left || typeScreen.Type == FileTypes.LeftAndDialog ||
+								typeScreen.Type == FileTypes.Note || typeScreen.Type == FileTypes.PlaceAndNote)
 							{
 								line = GetLine(ref i);
 							}
+							// обрезаем изображение, если указаны параметры (или просто обрезаем со старыми параметрами)
+							typeScreen.CroppedImage = typeScreen.FileSource.CropBitmapImage(CroppedWidth, CroppedHeight);
 							//
 							switch (typeScreen.Type)
 							{
 								case FileTypes.Menu:
 									{
-										typeScreen.UserControl = new TypeLocation(string.Empty, false, CurrentConfig ?? new Configuration(), typeScreen.FileSource, CroppedWidth, CroppedHeight);
+										typeScreen.UserControl = new TypeLocation(string.Empty, typeScreen.Type, CurrentConfig ?? new Configuration(), typeScreen.CroppedImage);
 										break;
 									}
 								case FileTypes.Place:
 									{
-										typeScreen.UserControl = new TypeLocation(line, true, CurrentConfig ?? new Configuration(), typeScreen.FileSource, CroppedWidth, CroppedHeight);
+										typeScreen.UserControl = new TypeLocation(line, typeScreen.Type, CurrentConfig ?? new Configuration(), typeScreen.CroppedImage);
+										break;
+									}
+								case FileTypes.PlaceAndNote:
+									{
+										string place = GetLine(ref i);
+										typeScreen.UserControl = new TypeLocation(place, typeScreen.Type, CurrentConfig ?? new Configuration(), typeScreen.CroppedImage, line);
 										break;
 									}
 								case FileTypes.Left:
 									{
-										typeScreen.UserControl = new TypeFrame(string.Empty, string.Empty, CurrentConfig ?? new Configuration(), typeScreen.FileSource, CroppedWidth, CroppedHeight, false, true,
-											line.Split("|"));
+										typeScreen.UserControl = new TypeFrame(string.Empty, string.Empty, CurrentConfig ?? new Configuration(), typeScreen.CroppedImage, typeScreen.Type,
+											leftPlaceDescr: line.Split("|"));
 										break;
 									}
 								case FileTypes.Dialog:
@@ -693,7 +703,7 @@ namespace AutoType.Classes
 											IsEditMode = false;
 											return;
 										}
-										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen.FileSource, CroppedWidth, CroppedHeight, true, false);
+										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen.CroppedImage, typeScreen.Type);
 										break;
 									}
 								case FileTypes.None:
@@ -708,16 +718,37 @@ namespace AutoType.Classes
 											IsEditMode = false;
 											return;
 										}
-										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen.FileSource, CroppedWidth, CroppedHeight, true, true,
-											line.Split("|"));
+										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen.CroppedImage, typeScreen.Type,
+											leftPlaceDescr: line.Split("|"));
+										break;
+									}
+								case FileTypes.Note:
+									{
+										// сначала прогоняем текст до следующей строки, потом делим на имя и реплику
+										var lines = GetDialog(GetLine(ref i), i);
+										if (lines.Length <= 1)
+										{
+											MessageBox.Show($"Неправильная разметка на строке {i} ({lines[0]})");
+											IsEditMode = false;
+											return;
+										}
+										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen.CroppedImage, typeScreen.Type,
+											note: line);
 										break;
 									}
 							}
 							// делаем Source, чтобы отобразить на превью в списке
 							// если тип none, то просто делаем control image и в качестве источника подсовываем скрин, иначе берём usercontrol и преобразовываем к image
-							typeScreen.Source = typeScreen.MakeSource(typeScreen.Type == FileTypes.None ?
-								new System.Windows.Controls.Image() { Source = typeScreen.FileSource, Width = typeScreen.FileSource.Width, Height = typeScreen.FileSource.Height, HorizontalAlignment = System.Windows.HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Top } :
-								typeScreen.MakeImage(), CroppedWidth, CroppedHeight);
+							var image = typeScreen.Type == FileTypes.None ?
+								new System.Windows.Controls.Image()
+								{
+									Source = typeScreen.CroppedImage,
+									Width = typeScreen.CroppedImage.Width,
+									Height = typeScreen.CroppedImage.Height,
+									HorizontalAlignment = System.Windows.HorizontalAlignment.Center,
+									VerticalAlignment = VerticalAlignment.Top
+								} : typeScreen.UserControl.MakeImage();
+							typeScreen.Source = image.MakeSource();
 							CurrentScreen++;
 						}
 						catch (Exception e)
@@ -759,7 +790,7 @@ namespace AutoType.Classes
 
 			try
 			{
-				IEnumerable<TypeScreen> dialogScreens = Images.Where(item => item.Type == FileTypes.Dialog || item.Type == FileTypes.LeftAndDialog);
+				IEnumerable<TypeScreen> dialogScreens = Images.Where(item => item.Type == FileTypes.Dialog || item.Type == FileTypes.LeftAndDialog || item.Type == FileTypes.Note);
 				if (!dialogScreens.Any())
 				{
 					MessageBox.Show("Отсутствует изображение с диалогом!");
@@ -771,10 +802,10 @@ namespace AutoType.Classes
 					// в первую очередь ищем скриншот с рамкой диалога и левой рамкой
 					var imageExample = dialogScreens.FirstOrDefault(item => item.Type == FileTypes.LeftAndDialog);
 					// если не нашлось, то ищем просто с диалогом
-					imageExample ??= dialogScreens.FirstOrDefault(item => item.Type == FileTypes.Dialog);
+					imageExample ??= dialogScreens.FirstOrDefault(item => item.Type == FileTypes.Dialog || item.Type == FileTypes.Note);
 					ConfigurationWindow = new ConfigurationWindow
 					{
-						DataContext = new ConfigurationFrameModel(imageExample.Type, imageExample.FileSource, null, CroppedWidth, CroppedHeight, FrameMode) { Save = GetConfiguration }
+						DataContext = new ConfigurationFrameModel(imageExample.Type, imageExample.FileSource.CropBitmapImage(CroppedWidth, CroppedHeight), null, FrameMode) { Save = GetConfiguration }
 					};
 					ConfigurationWindow.Show();
 				}
@@ -794,7 +825,7 @@ namespace AutoType.Classes
 		/// </summary>
 		private void OpenPlaceConfiguration(Configuration? config)
 		{
-			var placeScreen = Images.Where(item => item.Type == FileTypes.Place).FirstOrDefault();
+			var placeScreen = Images.Where(item => item.Type == FileTypes.Place || item.Type == FileTypes.PlaceAndNote).FirstOrDefault();
 			if (placeScreen is null)
 			{
 				MessageBox.Show("Отсутствует изображение с местом!");
@@ -803,7 +834,7 @@ namespace AutoType.Classes
 
 			ConfigurationWindow = new ConfigurationWindow
 			{
-				DataContext = new ConfigurationFrameModel(placeScreen.Type, placeScreen.FileSource, config, CroppedWidth, CroppedHeight, FrameMode) { Save = GetConfiguration }
+				DataContext = new ConfigurationFrameModel(placeScreen.Type, placeScreen.FileSource.CropBitmapImage(CroppedWidth, CroppedHeight), config, FrameMode) { Save = GetConfiguration }
 			};
 			ConfigurationWindow.Show();
 		}
@@ -816,12 +847,13 @@ namespace AutoType.Classes
 			switch (dataContext.FileType)
 			{
 				case FileTypes.Dialog:
+				case FileTypes.Note:
 					var leftPlaceScreen = Images.Where(item => item.Type == FileTypes.Left).FirstOrDefault();
 					if (leftPlaceScreen is not null)
 					{
 						ConfigurationWindow = new ConfigurationWindow
 						{
-							DataContext = new ConfigurationFrameModel(leftPlaceScreen.Type, leftPlaceScreen.FileSource, config, CroppedWidth, CroppedHeight, FrameMode) { Save = GetConfiguration }
+							DataContext = new ConfigurationFrameModel(leftPlaceScreen.Type, leftPlaceScreen.FileSource.CropBitmapImage(CroppedWidth, CroppedHeight), config, FrameMode) { Save = GetConfiguration }
 						};
 						ConfigurationWindow.Show();
 					}
@@ -832,6 +864,7 @@ namespace AutoType.Classes
 					OpenPlaceConfiguration(config);
 					break;
 				case FileTypes.Place:
+				case FileTypes.PlaceAndNote:
 					AllConfigurationList.Add(config);
 					OnPropertyChanged(nameof(IsNotExistsConfiguration));
 					OnPropertyChanged(nameof(ConfigurationList));
@@ -951,93 +984,52 @@ namespace AutoType.Classes
 
 		#endregion
 
-		#endregion
+		#region CreateSaveCommand
 
-		#region Methods
-
-		public static Bitmap ToImage(byte[] bytes)
-		{
-			using (var stream = new MemoryStream(bytes))
-			using (var image = Image.FromStream(stream, false, true))
-			{
-				return new Bitmap(image);
-			}
-		}
-		private static ImageCodecInfo GetEncoderInfo(String mimeType)
-		{
-			int j;
-			ImageCodecInfo[] encoders;
-			encoders = ImageCodecInfo.GetImageEncoders();
-			for (j = 0; j < encoders.Length; ++j)
-			{
-				if (encoders[j].MimeType == mimeType)
-					return encoders[j];
-			}
-			return null;
-		}
-
-		private static BitmapImage CreateSource(byte[] bytes, string ext)
-		{
-			var bi = new BitmapImage();
-			Bitmap bmp = ToImage(bytes);
-			bmp.SetResolution(96, 96); // устанавливаем стандартное разрешение, чтобы изображение не менялось в размерах
-			using (var ms = new MemoryStream())
-			{
-				ImageCodecInfo myImageCodecInfo;
-
-				switch (ext)
-				{
-					case ".png":
-						myImageCodecInfo = GetEncoderInfo("image/png");
-						break;
-					case ".jpeg":
-						myImageCodecInfo = GetEncoderInfo("image/jpeg");
-						break;
-					default:
-						myImageCodecInfo = GetEncoderInfo("image/jpeg");
-						break;
-				}
-
-				// Create an Encoder object based on the GUID
-				// for the ColorDepth parameter category.
-				Encoder myEncoder = Encoder.ColorDepth;
-
-				// Create an EncoderParameters object.
-				// An EncoderParameters object has an array of EncoderParameter
-				// objects. In this case, there is only one
-				// EncoderParameter object in the array.
-				EncoderParameters myEncoderParameters = new EncoderParameters(1);
-
-				// Save the image with a color depth of 24 bits per pixel.
-				EncoderParameter myEncoderParameter =
-					new EncoderParameter(myEncoder, 24L);
-				myEncoderParameters.Param[0] = myEncoderParameter;
-				bmp.Save(ms, myImageCodecInfo, myEncoderParameters);
-
-				ms.Position = 0;
-				bi.BeginInit();
-				bi.CacheOption = BitmapCacheOption.OnLoad;
-				bi.StreamSource = ms;
-				bi.EndInit();
-			}
-			return bi;
-		}
+		private RelayCommand? _createSaveCommand;
 
 		/// <summary>
-		/// Для сортировки файлов в алфавитном порядке
+		/// Открытие ворд документа и получение всего текста из него
 		/// </summary>
-		public class MyComparer : IComparer<string>
+		public RelayCommand CreateSaveCommand => _createSaveCommand ??= new RelayCommand(CreateSave, param => true);
+
+		private void CreateSave()
 		{
-
-			[DllImport("shlwapi.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
-			static extern int StrCmpLogicalW(String x, String y);
-
-			public int Compare(string x, string y)
+			var folder = "F:\\test\\";
+			foreach (var image in Images)
 			{
-				return StrCmpLogicalW(x, y);
+				image.SaveTypeToFile(folder + Images.IndexOf(image) + ".txt");
 			}
 
+			Images.Clear();
+			MessageBox.Show("Сохранение успешно создано!");
 		}
+
+		#endregion
+
+		#region OpenSaveCommand
+
+		private RelayCommand? _openSaveCommand;
+
+		/// <summary>
+		/// Открытие ворд документа и получение всего текста из него
+		/// </summary>
+		public RelayCommand OpenSaveCommand => _openSaveCommand ??= new RelayCommand(OpenSave, param => true);
+
+		private void OpenSave()
+		{
+			Images.Clear();
+			var folder = "F:\\test\\";
+			List<string> files = Directory.GetFiles(folder).ToList();
+			foreach (var file in files)
+			{
+				Images.Add(new TypeScreen(file));
+			}
+
+			MessageBox.Show("Сохранение успешно выгружено!");
+		}
+
+		#endregion
 
 		#endregion
 	}

@@ -35,6 +35,8 @@
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
             <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Horizontal" Margin="0 50 0 10">
+                <Button Content="Создать сохранение" Width="120" Height="50" Command="{Binding CreateSaveCommand}"/>
+                <Button Content="Открыть сохранение" Width="120" Height="50" Command="{Binding OpenSaveCommand}"/>
                 <Button Content="Выбрать файл" Width="120" Height="50" Command="{Binding OpenFileCommand}"/>
                 <Button Content="Выбрать папку" Width="120" Height="50" Command="{Binding OpenFolderCommand}"/>
                 <Button Content="Сгенерировать" Width="120" Height="50" Command="{Binding EditFileCommand}"/>

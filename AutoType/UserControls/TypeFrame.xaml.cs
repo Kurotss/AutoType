@@ -12,25 +12,24 @@ namespace AutoType.UserControls
 	/// </summary>
 	public partial class TypeFrame : UserControl
 	{
-		public TypeFrame(string characterName, string description, Configuration config, BitmapImage source, double? CroppedWidth, double? CroppedHeight,
-			bool isDialog, bool isLeftPlace, string[]? leftPlaceDescr = null)
+		public TypeFrame() { }
+
+		public TypeFrame(string characterName, string description, Configuration config, CroppedBitmap source, FileTypes fileType, string[]? leftPlaceDescr = null,
+			string? note = null)
 		{
 			InitializeComponent();
-			// если не указаны параметры по обрезке скринов, то устанавливаем исходные скрины
-			if (CroppedWidth == null || CroppedHeight == null)
-				screen.Source = source;
-			// иначе обрезаем скрины и устанавливаем их
-			else
-				screen.Source = new CroppedBitmap(source, new Int32Rect((int)(source.Width - CroppedWidth) / 2, (int)(source.Height - CroppedHeight) / 2, (int)CroppedWidth, (int)CroppedHeight));
-			// устанавливаем размеры контроля под размеры необрезанного скриншота
+			Tag = config.FrameMode;
+			// устанавливаем размеры контроля под размеры обрезанного скриншота
+			screen.Source = source;
 			Height = screen.Source.Height;
 			Width = screen.Source.Width;
+
 			// режим старой рамки
 			if (config.FrameMode == FrameMode.Old)
 			{
 				gridOld.Visibility = Visibility.Visible;
 				// если скриншот с репликой
-				if (isDialog)
+				if (fileType == FileTypes.Dialog || fileType == FileTypes.LeftAndDialog || fileType == FileTypes.Note)
 				{
 					gridFrame.Visibility = Visibility.Visible;
 					//
@@ -48,19 +47,17 @@ namespace AutoType.UserControls
 				imgMenu.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
 				imgMenu.Margin = config.MarginForMenu;
 				// если скриншот с левой рамкой места
-				if (isLeftPlace)
+				if (fileType == FileTypes.Left || fileType == FileTypes.LeftAndDialog)
 				{
 					gridLeftPlace.Visibility = Visibility.Visible;
 					if (leftPlaceDescr is null || leftPlaceDescr.Length < 1)
 						throw new Exception("Некорректная разметка для места слева.");
-					else if (leftPlaceDescr.Length == 1)
-						txtLeftPlace.Text = leftPlaceDescr[0];
+					txtLeftPlace.Text = leftPlaceDescr[0];
 					// если составное место слева
-					else if (leftPlaceDescr.Length == 2)
+					if (leftPlaceDescr.Length == 2)
 					{
-						txtLeftPlace.Text = leftPlaceDescr[0] + " " + leftPlaceDescr[1];
-						spSecondLeftPlace.Visibility = Visibility.Visible;
-						txtSecondLeftPlace.Text = leftPlaceDescr[0];
+						txtTubeOld.Visibility = Visibility.Visible;
+						txtSecondLeftPlace.Text = leftPlaceDescr[1].TrimStart();
 					}
 
 					gridLeftPlace.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
@@ -69,7 +66,7 @@ namespace AutoType.UserControls
 			}
 			else if (config.FrameMode == FrameMode.New)
 			{
-				if (isDialog)
+				if (fileType == FileTypes.Dialog || fileType == FileTypes.LeftAndDialog || fileType == FileTypes.Note)
 				{
 					gridNew.Visibility = Visibility.Visible;
 
@@ -116,7 +113,7 @@ namespace AutoType.UserControls
 					}
 				}
 
-				if (isLeftPlace)
+				if (fileType == FileTypes.Left || fileType == FileTypes.LeftAndDialog)
 				{
 					gridLeftPlaceNew.Visibility = Visibility.Visible;
 					if (leftPlaceDescr is null || leftPlaceDescr.Length < 1)
@@ -126,11 +123,19 @@ namespace AutoType.UserControls
 					if (leftPlaceDescr.Length == 2)
 					{
 						txtTube.Visibility = Visibility.Visible;
-						txtSecondLeftPlaceNew.Text = leftPlaceDescr[1];
+						txtSecondLeftPlaceNew.Text = leftPlaceDescr[1].TrimStart();
 					}
 
 					gridLeftPlaceNew.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, 0, 0);
 				}
+			}
+
+			if (fileType == FileTypes.Note)
+			{
+				txtNote.Visibility = Visibility.Visible;
+				txtNote.Text = note;
+				txtNote.Width = (Width - 200) / config.Scale; // устанавливаем ширину примечание, чтобы не заползало на меню
+				txtNote.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, 0, 0);
 			}
 			DataContext = this;
 		}

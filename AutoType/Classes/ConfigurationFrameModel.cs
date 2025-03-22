@@ -6,14 +6,9 @@ namespace AutoType.Classes
 {
 	public class ConfigurationFrameModel : BaseDataContext
 	{
-		public ConfigurationFrameModel(FileTypes fileType, BitmapSource image, Configuration? config, double? croppedWidth, double? croppedHeight, FrameMode frameMode)
+		public ConfigurationFrameModel(FileTypes fileType, CroppedBitmap image, Configuration? config, FrameMode frameMode)
 		{
-			if (image.Width - croppedWidth < 0 || image.Height - croppedHeight < 0)
-				throw new ArgumentException("Параметры для обрезки не должны быть больше исходных размеров картинок.");
-			if (croppedWidth == null || croppedHeight == null)
-				ImageExample = image;
-			else
-				ImageExample = new CroppedBitmap(image, new Int32Rect((int)(image.Width - croppedWidth) / 2, (int)(image.Height - croppedHeight) / 2, (int)croppedWidth, (int)croppedHeight));
+			ImageExample = image;
 			FileType = fileType;
 			Config = config;
 			if (config != null)

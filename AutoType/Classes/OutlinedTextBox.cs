@@ -57,7 +57,7 @@ namespace AutoType.Classes
 				else
 				{
 					//Remove the adorner from the adorner layer.
-					Adorner[] adorners = layer.GetAdorners(textBlock);
+					Adorner[] adorners = layer?.GetAdorners(textBlock);
 					if (adorners != null)
 					{
 						foreach (Adorner adorner in adorners)
