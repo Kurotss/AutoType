@@ -9,22 +9,19 @@ namespace AutoType.Classes
 	/// </summary>
 	public class EditWindowModel : BaseDataContext
 	{
-		public EditWindowModel(UserControl userControl, bool isLeftPlace,
-			bool isComplexLeftPlace, FrameMode frameMode)
+		public EditWindowModel(UserControl userControl)
 		{
 			UserControl = userControl;
 			OnPropertyChanged(nameof(UserControl));
-			IsComplexLeftPlace = isComplexLeftPlace;
-			IsLeftPlace = isLeftPlace;
-			FrameMode = frameMode;
+
+			var gridLeftPlace = UserControl.GetControlWithMode(Definitions.GRID_LEFT_PLACE) as Grid;
+			var txtTube = UserControl.GetControlWithMode(Definitions.TXT_TUBE) as TextBox;
+
+			IsLeftPlace = gridLeftPlace.Visibility == Visibility.Visible;
+			IsComplexLeftPlace = txtTube.Visibility == Visibility.Visible;
 		}
 
 		#region Properties
-
-		/// <summary>
-		/// Тип рамки: старая, новая
-		/// </summary>
-		public FrameMode FrameMode { get; set; }
 
 		/// <summary>
 		/// Юзер контроль с содержимым скрина с тайпом
@@ -57,22 +54,15 @@ namespace AutoType.Classes
 			set
 			{
 				_isComplexLeftPlace = value;
-				if (UserControl is TypeFrame typeFrame)
+				if (UserControl is TypeFrame)
 				{
-					if (FrameMode == FrameMode.Old)
-					{
-						typeFrame.txtTubeOld.Visibility = IsComplexLeftPlace ? Visibility.Visible : Visibility.Collapsed;
-						typeFrame.txtSecondLeftPlace.Visibility = IsComplexLeftPlace ? Visibility.Visible : Visibility.Collapsed;
-						if (typeFrame.txtSecondLeftPlace.Visibility == Visibility.Collapsed)
-							typeFrame.txtSecondLeftPlace.Text = "Часть 2";
-					}
-					if (FrameMode == FrameMode.New)
-					{
-						typeFrame.txtTube.Visibility = IsComplexLeftPlace ? Visibility.Visible : Visibility.Collapsed;
-						typeFrame.txtSecondLeftPlaceNew.Visibility = IsComplexLeftPlace ? Visibility.Visible : Visibility.Collapsed;
-						if (typeFrame.txtSecondLeftPlaceNew.Visibility == Visibility.Collapsed)
-							typeFrame.txtSecondLeftPlaceNew.Text = "Часть 2";
-					}
+					var txtTube = UserControl.GetControlWithMode(Definitions.TXT_TUBE) as TextBox;
+					var txtSecondLeftPlace = UserControl.GetControlWithMode(Definitions.TXT_SECOND_LEFT_PLACE) as TextBox;
+
+					txtTube.Visibility = IsComplexLeftPlace ? Visibility.Visible : Visibility.Collapsed;
+					txtSecondLeftPlace.Visibility = IsComplexLeftPlace ? Visibility.Visible : Visibility.Collapsed;
+					if (txtSecondLeftPlace.Visibility == Visibility.Collapsed)
+						txtSecondLeftPlace.Text = "Часть 2";
 				}
 				OnPropertyChanged(nameof(IsComplexLeftPlace));
 			}

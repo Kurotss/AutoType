@@ -42,7 +42,15 @@ namespace AutoType.Classes
 					CurrentConfig = ConfigurationList.FirstOrDefault();
 				}
 				OnPropertyChanged(nameof(IsNotExistsConfiguration));
-				OnPropertyChanged(nameof(ConfigurationList));
+				// выгружаем сохранения, если есть
+				string saveFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/AutoType/Saves/" + SaveName + '/';
+				if (Directory.Exists(saveFolder))
+				{
+					var folders = Directory.GetDirectories(saveFolder).ToList();
+					foreach (var folder in folders)
+						SaveFolders.Add(new SaveFolder(folder, Path.GetFileName(folder), File.GetCreationTime(folder)));
+
+				}
 			}
 			catch (Exception e)
 			{
@@ -56,7 +64,7 @@ namespace AutoType.Classes
 
 		#region Images
 
-		private ObservableCollection<TypeScreen> _images = new ObservableCollection<TypeScreen>();
+		private ObservableCollection<TypeScreen> _images = new();
 
 		/// <summary>
 		/// Коллекция с объектами с информацией по скриншотам
@@ -68,6 +76,25 @@ namespace AutoType.Classes
 			{
 				_images = value;
 				OnPropertyChanged(nameof(Images));
+			}
+		}
+
+		#endregion
+
+		#region SaveFolders
+
+		private ObservableCollection<SaveFolder> _saveFolders = new();
+
+		/// <summary>
+		/// Коллекция сохранений
+		/// </summary>
+		public ObservableCollection<SaveFolder> SaveFolders
+		{
+			get => _saveFolders;
+			set
+			{
+				_saveFolders = value;
+				OnPropertyChanged(nameof(SaveFolders));
 			}
 		}
 
@@ -109,6 +136,9 @@ namespace AutoType.Classes
 
 		private bool _isEditMode;
 
+		/// <summary>
+		/// Режим тайпа картинок
+		/// </summary>
 		public bool IsEditMode
 		{
 			get => _isEditMode;
@@ -154,6 +184,44 @@ namespace AutoType.Classes
 			{
 				_isSaveImagesMode = value;
 				OnPropertyChanged(nameof(IsSaveImagesMode));
+			}
+		}
+
+		#endregion
+
+		#region IsCreateSaveMode
+
+		/// <summary>
+		/// Режим создания сохранения
+		/// </summary>
+		private bool _isCreateSaveMode;
+
+		public bool IsCreateSaveMode
+		{
+			get => _isCreateSaveMode;
+			set
+			{
+				_isCreateSaveMode = value;
+				OnPropertyChanged(nameof(IsCreateSaveMode));
+			}
+		}
+
+		#endregion
+
+		#region IsOpenSaveMode
+
+		/// <summary>
+		/// Режим открытия сохранения
+		/// </summary>
+		private bool _isOpenSaveMode;
+
+		public bool IsOpenSaveMode
+		{
+			get => _isOpenSaveMode;
+			set
+			{
+				_isOpenSaveMode = value;
+				OnPropertyChanged(nameof(IsOpenSaveMode));
 			}
 		}
 
@@ -238,7 +306,7 @@ namespace AutoType.Classes
 			set
 			{
 				var newValue = value.Replace("\\", string.Empty);
-				if (CheckPrefix(newValue))
+				if (CheckPath(newValue))
 				{
 					_prefix = newValue;
 					OnPropertyChanged(nameof(Prefix));
@@ -246,9 +314,9 @@ namespace AutoType.Classes
 			}
 		}
 
-		public bool CheckPrefix(string str)
+		public bool CheckPath(string str)
 		{
-			Regex regex = new Regex(".*[\\<>:\"|?*/]+.*");
+			Regex regex = new(".*[\\<>:\"|?*/]+.*");
 			MatchCollection matches = regex.Matches(str);
 			if (matches.Count >= 1)
 			{
@@ -306,6 +374,29 @@ namespace AutoType.Classes
 		}
 
 		#endregion
+
+		#endregion
+
+		#region SaveName
+
+		/// <summary>
+		/// Название для сохранения
+		/// </summary>
+		private string _saveName;
+
+		public string SaveName
+		{
+			get => _saveName;
+			set
+			{
+				var newValue = value.Replace("\\", string.Empty);
+				if (CheckPath(newValue))
+				{
+					_saveName = newValue;
+					OnPropertyChanged(nameof(SaveName));
+				}
+			}
+		}
 
 		#endregion
 
@@ -413,7 +504,7 @@ namespace AutoType.Classes
 					List<string> files = Directory.GetFiles(dialog.SelectedPath).ToList();
 					files.Sort(new MyComparer());
 					// очищаем коллекцию скриншотов, если уже были старые
-					Images = new ObservableCollection<TypeScreen>();
+					Images.Clear();
 					SaveFileCommand = null;
 					IsGetImagesMode = true;
 					CurrentScreen = 0;
@@ -425,6 +516,7 @@ namespace AutoType.Classes
 					{
 						string[] fileNames = dialog.SelectedPath.Split('\\');
 						Prefix = fileNames[^1];
+						SaveName = fileNames[^1];
 					}
 				}
 				catch (Exception e)
@@ -674,24 +766,23 @@ namespace AutoType.Classes
 							{
 								case FileTypes.Menu:
 									{
-										typeScreen.UserControl = new TypeLocation(string.Empty, typeScreen.Type, CurrentConfig ?? new Configuration(), typeScreen.CroppedImage);
+										typeScreen.UserControl = new TypeLocation(string.Empty, CurrentConfig ?? new Configuration(), typeScreen);
 										break;
 									}
 								case FileTypes.Place:
 									{
-										typeScreen.UserControl = new TypeLocation(line, typeScreen.Type, CurrentConfig ?? new Configuration(), typeScreen.CroppedImage);
+										typeScreen.UserControl = new TypeLocation(line, CurrentConfig ?? new Configuration(), typeScreen);
 										break;
 									}
 								case FileTypes.PlaceAndNote:
 									{
 										string place = GetLine(ref i);
-										typeScreen.UserControl = new TypeLocation(place, typeScreen.Type, CurrentConfig ?? new Configuration(), typeScreen.CroppedImage, line);
+										typeScreen.UserControl = new TypeLocation(place, CurrentConfig ?? new Configuration(), typeScreen, line);
 										break;
 									}
 								case FileTypes.Left:
 									{
-										typeScreen.UserControl = new TypeFrame(string.Empty, string.Empty, CurrentConfig ?? new Configuration(), typeScreen.CroppedImage, typeScreen.Type,
-											leftPlaceDescr: line.Split("|"));
+										typeScreen.UserControl = new TypeFrame(string.Empty, string.Empty, CurrentConfig ?? new Configuration(), typeScreen, leftPlaceDescr: line.Split("|"));
 										break;
 									}
 								case FileTypes.Dialog:
@@ -703,7 +794,7 @@ namespace AutoType.Classes
 											IsEditMode = false;
 											return;
 										}
-										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen.CroppedImage, typeScreen.Type);
+										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen);
 										break;
 									}
 								case FileTypes.None:
@@ -718,8 +809,7 @@ namespace AutoType.Classes
 											IsEditMode = false;
 											return;
 										}
-										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen.CroppedImage, typeScreen.Type,
-											leftPlaceDescr: line.Split("|"));
+										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen, leftPlaceDescr: line.Split("|"));
 										break;
 									}
 								case FileTypes.Note:
@@ -732,8 +822,7 @@ namespace AutoType.Classes
 											IsEditMode = false;
 											return;
 										}
-										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen.CroppedImage, typeScreen.Type,
-											note: line);
+										typeScreen.UserControl = new TypeFrame(lines[0].Trim(), lines[1].Trim(), CurrentConfig ?? new Configuration(), typeScreen, note: line);
 										break;
 									}
 							}
@@ -989,20 +1078,91 @@ namespace AutoType.Classes
 		private RelayCommand? _createSaveCommand;
 
 		/// <summary>
-		/// Открытие ворд документа и получение всего текста из него
+		/// Создание сохранения для текущего тайпа
 		/// </summary>
 		public RelayCommand CreateSaveCommand => _createSaveCommand ??= new RelayCommand(CreateSave, param => true);
 
-		private void CreateSave()
+		private async void CreateSave()
 		{
-			var folder = "F:\\test\\";
-			foreach (var image in Images)
+			if (string.IsNullOrEmpty(SaveName))
 			{
-				image.SaveTypeToFile(folder + Images.IndexOf(image) + ".txt");
+				MessageBox.Show("Задайте название сохранению.");
+				return;
 			}
 
-			Images.Clear();
-			MessageBox.Show("Сохранение успешно создано!");
+			var folders = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/AutoType/Saves/");
+			if (folders.Any(x => x == SaveName))
+			{
+				MessageBox.Show("Уже есть сохранение с таким названием.");
+				return;
+			}
+
+			if (Images.Count == 0 || Images.Any(x => !x.IsNotNullSource))
+			{
+				MessageBox.Show("Нет изображений с тайпом для сохранения.");
+				return;
+			}
+
+			try
+			{
+				// если сохранений уже 10, то удаляем самое старое
+				if (SaveFolders?.Count == 10)
+				{
+					var oldestFolder = SaveFolders.OrderBy(x => x.CreationDate).First();
+					Directory.Delete(oldestFolder.FullPath, true);
+					SaveFolders.Remove(oldestFolder);
+				}
+
+				// если нет папки под сохранение, то создаём
+				string saveFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/AutoType/Saves/" + SaveName;
+				// если уже есть папка с таким названием сохранения, то она будет перезаписана
+				if (Directory.Exists(saveFolder))
+				{
+					Directory.Delete(saveFolder, true);
+
+					var folderToRemove = SaveFolders.First(x => x.FolderName == SaveName);
+					SaveFolders.Remove(folderToRemove);
+				}
+				var directoryInfo = Directory.CreateDirectory(saveFolder);
+
+				IsCreateSaveMode = true;
+				CurrentScreen = 0;
+				Max = Images.Count;
+				//
+				await Task.Run(() => CreateSaveForImagesAsync(saveFolder));
+				//
+				SaveFolders.Add(new SaveFolder(saveFolder, Path.GetFileName(saveFolder), File.GetCreationTime(saveFolder)));
+				SaveFileCommand = null;
+				MessageBox.Show("Сохранение успешно создано!");
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message);
+			}
+			finally
+			{
+				IsCreateSaveMode = false;
+			}
+		}
+
+		/// <summary>
+		/// Перебирает все картинки и создаёт сохранение
+		/// </summary>
+		async Task CreateSaveForImagesAsync(string saveFolder)
+		{
+			foreach (var image in Images)
+			{
+				var thread = new Thread(() =>
+				{
+					Application.Current.Dispatcher.Invoke(() =>
+					{
+						image.SaveTypeToFile(Path.Combine(saveFolder, Images.IndexOf(image) + ".txt"));
+						CurrentScreen++;
+					});
+				});
+				thread.Start();
+				thread.Join();
+			}
 		}
 
 		#endregion
@@ -1012,21 +1172,53 @@ namespace AutoType.Classes
 		private RelayCommand? _openSaveCommand;
 
 		/// <summary>
-		/// Открытие ворд документа и получение всего текста из него
+		/// Распаковка сохранения
 		/// </summary>
-		public RelayCommand OpenSaveCommand => _openSaveCommand ??= new RelayCommand(OpenSave, param => true);
+		public RelayCommand OpenSaveCommand => _openSaveCommand ??= new RelayCommand(param => OpenSave(param), param => true);
 
-		private void OpenSave()
+		private async void OpenSave(object parameter)
 		{
 			Images.Clear();
-			var folder = "F:\\test\\";
-			List<string> files = Directory.GetFiles(folder).ToList();
+			try
+			{
+				var folder = parameter.ToString();
+				List<string> files = Directory.GetFiles(folder).ToList();
+				IsOpenSaveMode = true;
+				CurrentScreen = 0;
+				Max = files.Count;
+				//
+				await Task.Run(() => GetImagesFromSave(files));
+				//
+				Prefix = Path.GetFileName(folder);
+				SaveName = Path.GetFileName(folder);
+				SaveFileCommand = null;
+				MessageBox.Show("Сохранение успешно выгружено!");
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message);
+			}
+			finally
+			{
+				IsOpenSaveMode = false;
+			}
+		}
+
+		async Task GetImagesFromSave(List<string> files)
+		{
 			foreach (var file in files)
 			{
-				Images.Add(new TypeScreen(file));
+				var thread = new Thread(() =>
+				{
+					Application.Current.Dispatcher.Invoke(() =>
+					{
+						Images.Add(new TypeScreen(file));
+						CurrentScreen++;
+					});
+				});
+				thread.Start();
+				thread.Join();
 			}
-
-			MessageBox.Show("Сохранение успешно выгружено!");
 		}
 
 		#endregion

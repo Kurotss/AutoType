@@ -11,7 +11,15 @@ namespace AutoType.Classes
 			_canExecute = canExecute;
 		}
 
+		// Конструктор для команд с параметром
+		public RelayCommand(Action<object> execute, Func<object, bool> canExecute = null)
+		{
+			_executeWithParameter = execute ?? throw new ArgumentNullException(nameof(execute));
+			_canExecute = canExecute;
+		}
+
 		private Action _execute;
+		private readonly Action<object> _executeWithParameter;
 		private Func<object, bool> _canExecute;
 
 		public event EventHandler CanExecuteChanged;
@@ -23,7 +31,14 @@ namespace AutoType.Classes
 
 		public void Execute(object parameter)
 		{
-			_execute();
+			if (_executeWithParameter != null)
+			{
+				_executeWithParameter(parameter);
+			}
+			else if (_execute != null)
+			{
+				_execute();
+			}
 		}
 	}
 }

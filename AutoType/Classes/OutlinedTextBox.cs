@@ -30,7 +30,7 @@ namespace AutoType.Classes
 		/// Determines whether [is in edit mode update] [the specified obj].
 		/// </summary>
 		/// <param name="obj">The obj.</param>
-		/// <param name="e">The <see cref="System.Windows.DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
+		/// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
 		private static void IsInEditModeUpdate(DependencyObject obj, DependencyPropertyChangedEventArgs e)
 		{
 			OutlinedTextBox textBlock = obj as OutlinedTextBox;

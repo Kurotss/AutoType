@@ -3,7 +3,6 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace AutoType.UserControls
 {
@@ -14,128 +13,79 @@ namespace AutoType.UserControls
 	{
 		public TypeFrame() { }
 
-		public TypeFrame(string characterName, string description, Configuration config, CroppedBitmap source, FileTypes fileType, string[]? leftPlaceDescr = null,
-			string? note = null)
+		public TypeFrame(string characterName, string description, Configuration config, TypeScreen typeScreen, string[]? leftPlaceDescr = null, string? note = null)
 		{
 			InitializeComponent();
 			Tag = config.FrameMode;
 			// устанавливаем размеры контроля под размеры обрезанного скриншота
-			screen.Source = source;
+			screen.Source = typeScreen.CroppedImage;
 			Height = screen.Source.Height;
 			Width = screen.Source.Width;
 
-			// режим старой рамки
-			if (config.FrameMode == FrameMode.Old)
+			// получаем контроли из обеих версий рамки
+			var gridMain = this.GetControlWithMode(Definitions.GRID) as Grid;
+			var gridLeftPlace = this.GetControlWithMode(Definitions.GRID_LEFT_PLACE) as Grid;
+			var imgFrame = this.GetControlWithMode(Definitions.IMG_FRAME) as Image;
+			dynamic txtName = this.GetControlWithMode(Definitions.TXT_NAME);
+			dynamic txtDescr = this.GetControlWithMode(Definitions.TXT_DESCR);
+			var txtLeftPlace = this.GetControlWithMode(Definitions.TXT_LEFT_PLACE) as TextBox;
+			var txtTube = this.GetControlWithMode(Definitions.TXT_TUBE) as TextBox;
+			var txtSecondLeftPlace = this.GetControlWithMode(Definitions.TXT_SECOND_LEFT_PLACE) as TextBox;
+
+			// проставляем папраметры наложения главному контейнеру
+			gridMain.Visibility = Visibility.Visible;
+			gridMain.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgFrame.Width / 2, imgFrame.Height / 2);
+			imgMenu.Margin = config.MarginForMenu;
+			// если это репдика, то проставляем текст и параметры наложения
+			if (typeScreen.IsDialog)
 			{
-				gridOld.Visibility = Visibility.Visible;
-				// если скриншот с репликой
-				if (fileType == FileTypes.Dialog || fileType == FileTypes.LeftAndDialog || fileType == FileTypes.Note)
-				{
-					gridFrame.Visibility = Visibility.Visible;
-					//
-					txtName.Text = characterName;
-					if (characterName.Length > 16)
-					{
-						txtName.FontSize = 46;
-						txtName.Margin = new Thickness(txtName.Margin.Left, txtName.Margin.Top, txtName.Margin.Right, txtName.Margin.Bottom - 4);
-					}
-					txtDescr.Text = description;
-					gridFrame.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
-					gridFrame.Margin = config.MarginForDialog;
-				}
-				//
-				imgMenu.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
-				imgMenu.Margin = config.MarginForMenu;
-				// если скриншот с левой рамкой места
-				if (fileType == FileTypes.Left || fileType == FileTypes.LeftAndDialog)
-				{
-					gridLeftPlace.Visibility = Visibility.Visible;
-					if (leftPlaceDescr is null || leftPlaceDescr.Length < 1)
-						throw new Exception("Некорректная разметка для места слева.");
-					txtLeftPlace.Text = leftPlaceDescr[0];
-					// если составное место слева
-					if (leftPlaceDescr.Length == 2)
-					{
-						txtTubeOld.Visibility = Visibility.Visible;
-						txtSecondLeftPlace.Text = leftPlaceDescr[1].TrimStart();
-					}
+				gridFrame.Visibility = Visibility.Visible;
+				gridFrame.Margin = config.MarginForDialog;
 
-					gridLeftPlace.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameOld.Width / 2, imgFrameOld.Height / 2);
-					gridLeftPlace.Margin = config.MarginForLeftPlace;
+				txtName.Text = characterName;
+				if (characterName.Length > 16) // если длинное имя
+				{
+					txtName.FontSize = config.FrameMode == FrameMode.Old ? 46 : 43.3;
+					txtName.Margin = config.FrameMode == FrameMode.Old ?
+						new Thickness(txtName.Margin.Left, txtName.Margin.Top, txtName.Margin.Right, txtName.Margin.Bottom - 4) :
+						new Thickness(0, 0, 1084.4, 275.4);
 				}
+				txtDescr.Text = description;
 			}
-			else if (config.FrameMode == FrameMode.New)
+			// если это левая рамка мест, то заполняем её и настраиваем
+			if (typeScreen.IsLeftPlace)
 			{
-				if (fileType == FileTypes.Dialog || fileType == FileTypes.LeftAndDialog || fileType == FileTypes.Note)
+				gridLeftPlace.Visibility = Visibility.Visible;
+				if (leftPlaceDescr is null || leftPlaceDescr.Length < 1)
+					throw new Exception("Некорректная разметка для места слева.");
+				txtLeftPlace.Text = leftPlaceDescr[0];
+				// если составное место слева
+				if (leftPlaceDescr.Length == 2)
 				{
-					gridNew.Visibility = Visibility.Visible;
-
-					// пробел - костыль, ибо слева обрезается обводка имени
-					txtNameNew.Text = " " + characterName;
-					if (characterName.Length > 16)
-					{
-						txtNameNew.FontSize = 43.3;
-						txtNameNew.Margin = new Thickness(0, 0, 1103.6, 275.4);
-
-					}
-					txtDescrNew.Text = description;
-
-					var scaleWidthFrame = imgFrameNew.Width * config.Scale;
-					// если ширина скриншота меньше рамки со скейлом, то надо её сначала обрезать
-					if (screen.Source.Width < scaleWidthFrame)
-					{
-						var croppedHorizontalPart = (scaleWidthFrame - screen.Source.Width) / config.Scale;
-						var scaleHeightFrame = imgFrameNew.Height * config.Scale;
-						double croppedVerticalPart;
-						// если высота скриншота меньше рамки со скейлом, то надо её и по высоте обрезать
-						if (screen.Source.Height < scaleHeightFrame)
-						{
-							croppedVerticalPart = (scaleHeightFrame - screen.Source.Height) / config.Scale;
-						}
-						else
-							croppedVerticalPart = 0;
-						var image = new BitmapImage(new Uri("pack://application:,,,/resources/frame_new.png"));
-						imgFrameNew.Source = new CroppedBitmap(image, new Int32Rect((int)croppedHorizontalPart / 2,
-							(int)croppedVerticalPart, (int)(imgFrameNew.Width - croppedHorizontalPart),
-							(int)(imgFrameNew.Height - croppedVerticalPart)));
-						imgFrameNew.Width -= croppedHorizontalPart;
-						imgFrameNew.Height -= croppedVerticalPart;
-					}
-
-					gridNew.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgFrameNew.Width / 2, imgFrameNew.Height);
-					// если скриншот больше рамки, то рамку надо растянуть
-					if (screen.Source.Width > scaleWidthFrame)
-					{
-						// высчитываем масштабирование, чтобы растянуть рамку до краёв скриншота
-						double horizontalScale = screen.Source.Width / imgFrameNew.Width;
-						// растягиваем рамку до краёв скрина
-						gridNew.LayoutTransform = new ScaleTransform(horizontalScale, horizontalScale, imgFrameNew.Width / 2, imgFrameNew.Height);
-					}
+					txtTube.Visibility = Visibility.Visible;
+					txtSecondLeftPlace.Text = leftPlaceDescr[1].TrimStart();
 				}
-
-				if (fileType == FileTypes.Left || fileType == FileTypes.LeftAndDialog)
-				{
-					gridLeftPlaceNew.Visibility = Visibility.Visible;
-					if (leftPlaceDescr is null || leftPlaceDescr.Length < 1)
-						throw new Exception("Некорректная разметка для места слева.");
-					txtLeftPlaceNew.Text = leftPlaceDescr[0];
-					// если составное место слева
-					if (leftPlaceDescr.Length == 2)
-					{
-						txtTube.Visibility = Visibility.Visible;
-						txtSecondLeftPlaceNew.Text = leftPlaceDescr[1].TrimStart();
-					}
-
-					gridLeftPlaceNew.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, 0, 0);
-				}
+				gridLeftPlace.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgFrame.Width / 2, imgFrame.Height / 2);
+				gridLeftPlace.Margin = config.MarginForLeftPlace;
 			}
-
-			if (fileType == FileTypes.Note)
+			// если есть примечание, то тайпим
+			if (typeScreen.Type == FileTypes.Note)
 			{
 				txtNote.Visibility = Visibility.Visible;
 				txtNote.Text = note;
 				txtNote.Width = (Width - 200) / config.Scale; // устанавливаем ширину примечание, чтобы не заползало на меню
 				txtNote.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, 0, 0);
+			}
+			if (config.FrameMode == FrameMode.New && typeScreen.IsDialog)
+			{
+				var scaleWidthFrame = imgFrame.Width * config.Scale;
+				if (screen.Source.Width > scaleWidthFrame)
+				{
+					// высчитываем масштабирование, чтобы растянуть рамку до краёв скриншота
+					double horizontalScale = screen.Source.Width / imgFrame.Width;
+					// растягиваем рамку до краёв скрина
+					gridMain.LayoutTransform = new ScaleTransform(horizontalScale, horizontalScale, imgFrame.Width / 2, imgFrame.Height);
+				}
 			}
 			DataContext = this;
 		}

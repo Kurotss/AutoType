@@ -37,7 +37,6 @@ namespace AutoType.Classes
 			{
 				_source = value;
 				OnPropertyChanged(nameof(Source));
-				OnPropertyChanged(nameof(WidthForPreview));
 				OnPropertyChanged(nameof(IsNotNullSource));
 			}
 		}
@@ -81,6 +80,16 @@ namespace AutoType.Classes
 		/// Режим рамки
 		/// </summary>
 		public FrameMode FrameMode { get; set; }
+
+		/// <summary>
+		/// Имеет ли этот скрин реплику
+		/// </summary>
+		public bool IsDialog => Type == FileTypes.Dialog || Type == FileTypes.LeftAndDialog || Type == FileTypes.Note;
+
+		/// <summary>
+		/// Имеет ли этот скрин левую рамку места
+		/// </summary>
+		public bool IsLeftPlace => Type == FileTypes.Left || Type == FileTypes.LeftAndDialog;
 
 		#endregion
 
@@ -151,14 +160,16 @@ namespace AutoType.Classes
 		/// </summary>
 		private XDocument ToXml()
 		{
+			string? xaml = null;
 			// зачищаем изображение, т.к. оно потом может сломать распаковку контрола
-			(UserControl.FindName("screen") as Image).Source = null;
-
-			var xaml = XamlWriter.Save(UserControl);
+			if (UserControl != null) // не у всех модет быть создан UserControl
+			{
+				(UserControl.FindName("screen") as Image).Source = null;
+				xaml = XamlWriter.Save(UserControl);
+			}
 
 			var xdoc = new XDocument(
 				new XElement(nameof(TypeScreen),
-					new XElement(nameof(Source), Source.BitmapSourceToBase64()),
 					new XElement(nameof(CroppedImage), CroppedImage.BitmapSourceToBase64()),
 					new XElement(nameof(UserControl), xaml),
 					new XElement(nameof(Type), (int)Type),
@@ -174,18 +185,32 @@ namespace AutoType.Classes
 		private void FromXml(string filepath)
 		{
 			XDocument xdoc = XDocument.Load(filepath);
-			Source = xdoc.Root.Element(nameof(Source))?.Value.ConvertBase64ToBitmapImage();
+			Type = (FileTypes)int.Parse(xdoc.Root.Element(nameof(Type))?.Value);
+			FrameMode = (FrameMode)int.Parse(xdoc.Root.Element(nameof(FrameMode))?.Value);
 
 			var croppedBitmapImage = xdoc.Root.Element(nameof(CroppedImage))?.Value.ConvertBase64ToBitmapImage();
 			CroppedImage = new CroppedBitmap(croppedBitmapImage, new Int32Rect(0, 0, (int)croppedBitmapImage.Width, (int)croppedBitmapImage.Height));
 			FileSource = croppedBitmapImage;
 
-			UserControl = (UserControl)XamlReader.Parse(xdoc.Root.Element(nameof(UserControl))?.Value);
-			// устанавливаем затёртую картинку
-			(UserControl.FindName("screen") as Image).Source = CroppedImage;
+			var xaml = xdoc.Root.Element(nameof(UserControl))?.Value;
+			if (!string.IsNullOrEmpty(xaml))
+			{
+				UserControl = (UserControl)XamlReader.Parse(xaml);
+				// устанавливаем затёртую картинку
+				(UserControl.FindName("screen") as Image).Source = CroppedImage;
+			}
 
-			Type = (FileTypes)int.Parse(xdoc.Root.Element(nameof(Type))?.Value);
-			FrameMode = (FrameMode)int.Parse(xdoc.Root.Element(nameof(FrameMode))?.Value);
+
+			var image = Type == FileTypes.None ?
+								new System.Windows.Controls.Image()
+								{
+									Source = CroppedImage,
+									Width = CroppedImage.Width,
+									Height = CroppedImage.Height,
+									HorizontalAlignment = HorizontalAlignment.Center,
+									VerticalAlignment = VerticalAlignment.Top
+								} : UserControl.MakeImage();
+			Source = image.MakeSource();
 		}
 
 		#endregion

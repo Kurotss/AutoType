@@ -10,15 +10,15 @@
     </UserControl.Resources>
     <Grid x:Name="mainGrid">
         <Image Name="screen" HorizontalAlignment="Center" VerticalAlignment="Bottom" IsHitTestVisible="False"/>
-        <Grid Name="gridLeftPlace" HorizontalAlignment="Center" VerticalAlignment="Bottom" Visibility="Collapsed">
+        <Grid Name="gridLeftPlaceOld" HorizontalAlignment="Center" VerticalAlignment="Bottom" Visibility="Collapsed">
             <Image Source="../Resources/left_place.png" Width="2335" Height="1080" HorizontalAlignment="Center" VerticalAlignment="Bottom" IsHitTestVisible="False"/>
             <StackPanel Height="50" Width="505" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0 0 1555 976"
                             Orientation="Horizontal">
-                <TextBox Name="txtLeftPlace" FontSize="31pt" FontFamily="../Resources/#Casper Bold"
+                <TextBox Name="txtLeftPlaceOld" FontSize="31pt" FontFamily="../Resources/#Casper Bold"
                              Foreground="White" Background="Transparent" BorderThickness="0" Panel.ZIndex="1"/>
                 <TextBox Name="txtTubeOld" Text="|" FontSize="31pt" FontFamily="../Resources/#Casper Bold"
                              Foreground="White" Background="Transparent" BorderThickness="0" Margin="-2 -3 10 0" Visibility="Collapsed"/>
-                <TextBox Name="txtSecondLeftPlace" FontSize="31pt" FontFamily="../Resources/#Casper Bold"
+                <TextBox Name="txtSecondLeftPlaceOld" FontSize="31pt" FontFamily="../Resources/#Casper Bold"
                              Foreground="White" Background="Transparent" BorderThickness="0" Panel.ZIndex="1"/>
             </StackPanel>
         </Grid>
@@ -27,20 +27,21 @@
             <Grid Name="gridFrame" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
                 <Image Name="imgFrameOld" Source="../Resources/frame.png" Width="2335" Height="1080" VerticalAlignment="Bottom" HorizontalAlignment="Center"
                          IsHitTestVisible="False"/>
-                <TextBox Name="txtName" Foreground="White" FontSize="56" Height="60" Width="570" Panel.ZIndex="1" Background="Transparent"
+                <TextBox Name="txtNameOld" Foreground="White" FontSize="56" Height="60" Width="570" Panel.ZIndex="1" Background="Transparent"
                          BorderThickness="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontFamily="../Resources/#Sekai Untitled medium" Margin="0 0 777 276" />
-                <TextBox Name="txtDescr" Foreground="#454257" FontSize="31.93pt" Height="200" Width="1440" Background="Transparent" BorderThickness="0" AcceptsReturn="True"
+                <TextBox Name="txtDescrOld" Foreground="#454257" FontSize="31.93pt" Height="200" Width="1440" Background="Transparent" BorderThickness="0" AcceptsReturn="True"
                          HorizontalAlignment="Center" VerticalAlignment="Bottom" FontFamily="../Resources/#Sekai Untitled medium" Margin="0 0 10.5 50.7" TextWrapping="Wrap"
                          Panel.ZIndex="1"/>
             </Grid>
         </Grid>
         <Grid Name="gridLeftPlaceNew" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed">
-            <Image Source="../Resources/left_place_new.png" Width="2400" Height="1080" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"/>
+            <Image Source="../Resources/left_place_new.png" Width="2400" Height="1080" HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"
+                   ClipToBounds="True"/>
 
             <StackPanel HorizontalAlignment="Left" VerticalAlignment="Top" Margin="33 43 0 0" Orientation="Horizontal">
                 <TextBox Name="txtLeftPlaceNew" FontSize="26.25pt" FontFamily="../Resources/#Etelka Pro"
                     Background="Transparent" BorderThickness="0" Foreground="White" Panel.ZIndex="1"/>
-                <TextBox Name="txtTube" Text="|" FontSize="26.25pt" FontFamily="../Resources/#Etelka Pro"
+                <TextBox Name="txtTubeNew" Text="|" FontSize="26.25pt" FontFamily="../Resources/#Etelka Pro"
                     Foreground="White" Background="Transparent" BorderThickness="0" Margin="-4 -3.5 4 0" Visibility="Collapsed"/>
                 <TextBox Name="txtSecondLeftPlaceNew" FontSize="26.25pt" FontFamily="../Resources/#Etelka Pro"
                     Background="Transparent" BorderThickness="0" Foreground="White" Panel.ZIndex="1"/>
@@ -49,7 +50,7 @@
         <Grid Name="gridNew" VerticalAlignment="Bottom" HorizontalAlignment="Center" Visibility="Collapsed">
             <Image Name="imgFrameNew" Source="../Resources/frame_new.png" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="2334" Height="1080"
                    IsHitTestVisible="False"/>
-            <classes:OutlinedTextBox  x:Name="txtNameNew" Fill="#fffdfe" FontSize="42.00pt" Width="565" Margin="0 0 1116.3 271.2" 
+            <classes:OutlinedTextBox x:Name="txtNameNew" Fill="#fffdfe" FontSize="42.00pt" Width="565" Margin="0 0 1088.1 271.2" 
                 FontFamily="../Resources/#Sekai Untitled medium" HorizontalAlignment="Center" VerticalAlignment="Bottom" TextAlignment="Left" 
                 StrokeThickness="6.8" Stroke="#555474" StrokePosition="Outside" xml:space="preserve" Panel.ZIndex="1"/>
             <classes:OutlinedTextBox x:Name="txtDescrNew" Fill="#fffeff" FontSize="31.85pt" Height="250" Width="1598" LineHeight="49" TextWrapping="Wrap"
@@ -59,7 +60,7 @@
 
         <classes:OutlinedTextBox x:Name="txtNote" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="19 10.5 0 0"
                               Fill="White" StrokeThickness="1.7" FontSize="22.8pt" Stroke="#444257" StrokePosition="Outside"
-                              FontFamily="../Resources/#Sekai Untitled medium" TextWrapping="Wrap" Visibility="Collapsed"/>
+                              FontFamily="../Resources/#Sekai Untitled medium" TextWrapping="Wrap" Visibility="Collapsed" Height="Auto"/>
 
         <TextBlock Text="Нажмите esc, чтобы выйти из режима редактирования" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="40" FontWeight="Bold" Foreground="Red"
                    Margin="0 0 0 -50" Visibility="{Binding ElementName=txtDescrNew, Path=IsInEditMode, Converter={StaticResource BoolToVisibilityConverter}}"/>

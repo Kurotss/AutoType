@@ -24,7 +24,7 @@
     <None Remove="Resources\ramka.png" />
     <None Remove="Resources\save.png" />
     <None Remove="Resources\sekai.ttf" />
-    <None Remove="Resources\примечание.png" />
+    <None Remove="Resources\образец.jpg" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,12 +37,6 @@
       <Isolated>false</Isolated>
       <EmbedInteropTypes>true</EmbedInteropTypes>
     </COMReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Resource Include="Resources\примечание.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
 
   <ItemGroup>
@@ -79,6 +73,9 @@
     <Resource Include="Resources\save.png" />
     <Resource Include="Resources\sekai.ttf">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\образец.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
 </Project>

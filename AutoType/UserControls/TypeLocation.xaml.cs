@@ -14,39 +14,30 @@ namespace AutoType.UserControls
 	{
 		public TypeLocation() { }
 
-		public TypeLocation(string place, FileTypes fileType, Configuration config, CroppedBitmap source, string note = null)
+		public TypeLocation(string place, Configuration config, TypeScreen typeScreen, string note = null)
 		{
 			InitializeComponent();
 			Tag = config.FrameMode;
 			// устанавливаем размеры контроля под размеры обрезанного скриншота
-			screen.Source = source;
+			screen.Source = typeScreen.CroppedImage;
 			Height = screen.Source.Height;
 			Width = screen.Source.Width;
-			// режим старой рамки
-			if (config?.FrameMode == FrameMode.Old)
-			{
-				txtPlace.Text = place;
-				//
-				gridOld.Visibility = Visibility.Visible;
-				//
-				if (fileType == FileTypes.Menu)
-					gridPlace.Visibility = Visibility.Collapsed;
-				//
-				gridPlace.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, 1167.5, 540);
-				gridPlace.Margin = config.MarginForPlace;
-				imgMenu.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, 1167.5, 540);
-				imgMenu.Margin = config.MarginForMenu;
-			}
-			// режим новой рамки
-			else
-			{
-				gridNew.Visibility = Visibility.Visible;
-				//
-				txtPlaceNew.Text = place;
-				gridNew.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgPlaceNew.Width / 2, imgPlaceNew.Height / 2);
-			}
 
-			if (fileType == FileTypes.PlaceAndNote)
+			var gridMain = this.GetControlWithMode(Definitions.GRID) as Grid;
+			var txtPlace = this.GetControlWithMode(Definitions.TXT_PLACE) as TextBox;
+			var imgPlace = this.GetControlWithMode(Definitions.IMG_PLACE) as Image;
+
+			gridMain.Visibility = Visibility.Visible;
+			gridMain.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, imgPlace.Width / 2, imgPlace.Height / 2);
+			txtPlace.Text = place;
+
+			if (typeScreen.Type == FileTypes.Menu)
+				gridPlace.Visibility = Visibility.Collapsed;
+
+			gridPlace.Margin = config.MarginForPlace;
+			imgMenu.Margin = config.MarginForMenu;
+
+			if (typeScreen.Type == FileTypes.PlaceAndNote)
 			{
 				txtNote.Visibility = Visibility.Visible;
 				txtNote.Text = note;

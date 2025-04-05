@@ -64,5 +64,10 @@
 		/// название изображения с меню
 		/// </summary>
 		public const string IMG_FRAME = "imgFrame";
+
+		/// <summary>
+		/// название изображения с рамкой места
+		/// </summary>
+		public const string IMG_PLACE = "imgPlace";
 	}
 }

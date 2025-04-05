@@ -11,12 +11,11 @@
     </UserControl.Resources>
     <Grid>
         <Image Name="screen" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-        <!--<Image Source="../Resources/образец.png" HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
         <Grid Name="gridOld" Visibility="Collapsed">
             <Image Name="imgMenu" Source="../Resources/menu.png" Width="2335" Height="1080" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
             <Grid Name="gridPlace" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Image Source="../Resources/ramka.png" Width="2335" Height="1080" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                <TextBox Name="txtPlace" FontFamily="../Resources/#Casper Bold" Foreground="White" FontSize="44" TextWrapping="Wrap" AcceptsReturn="True"
+                <Image Name="imgPlaceOld" Source="../Resources/ramka.png" Width="2335" Height="1080" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox Name="txtPlaceOld" FontFamily="../Resources/#Casper Bold" Foreground="White" FontSize="44" TextWrapping="Wrap" AcceptsReturn="True"
                        VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" Width="804" Background="Transparent" BorderThickness="0"/>
             </Grid>
         </Grid>
@@ -28,7 +27,7 @@
 
         <classes:OutlinedTextBox x:Name="txtNote" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="19 10.5 0 0"
                       Fill="White" StrokeThickness="1.7" FontSize="22.8pt" Stroke="#444257" StrokePosition="Outside"
-                      FontFamily="../Resources/#Sekai Untitled medium" TextWrapping="Wrap" Visibility="Collapsed"/>
+                      FontFamily="../Resources/#Sekai Untitled medium" TextWrapping="Wrap" Visibility="Collapsed" Height="Auto"/>
 
         <TextBlock Text="Нажмите esc, чтобы выйти из режима редактирования" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="40" FontWeight="Bold" Foreground="Red"
             Margin="0 0 0 -50" Visibility="{Binding ElementName=txtNote, Path=IsInEditMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
