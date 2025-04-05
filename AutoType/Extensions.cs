@@ -9,6 +9,7 @@ using Bitmap = System.Drawing.Bitmap;
 using AutoType.Classes;
 using AutoType.UserControls;
 using System.Xaml;
+using System.Collections.ObjectModel;
 
 namespace AutoType
 {

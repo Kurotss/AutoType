@@ -400,6 +400,20 @@ namespace AutoType.Classes
 
 		#endregion
 
+		#region Screen
+
+		/// <summary>
+		/// Ширина экрана под первый стек
+		/// </summary>
+		public static double LeftScreenWidth => SystemParameters.PrimaryScreenWidth / 6 * 1.8;
+
+		/// <summary>
+		/// Ширина экрана под второй стек
+		/// </summary>
+		public static double RightScreenWidth => SystemParameters.PrimaryScreenWidth / 6 * 4;
+
+		#endregion
+
 		public string[] AllText { get; set; }
 
 		public ConfigurationWindow ConfigurationWindow { get; set; }
@@ -1089,12 +1103,19 @@ namespace AutoType.Classes
 				MessageBox.Show("Задайте название сохранению.");
 				return;
 			}
-
-			var folders = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/AutoType/Saves/");
-			if (folders.Any(x => x == SaveName))
+			var directoryPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/AutoType/Saves/";
+			if (!Directory.Exists(directoryPath))
 			{
-				MessageBox.Show("Уже есть сохранение с таким названием.");
-				return;
+				Directory.CreateDirectory(directoryPath);
+			}
+			else
+			{
+				var folders = Directory.GetFiles(directoryPath);
+				if (folders.Any(x => x == SaveName))
+				{
+					MessageBox.Show("Уже есть сохранение с таким названием.");
+					return;
+				}
 			}
 
 			if (Images.Count == 0 || Images.Any(x => !x.IsNotNullSource))
@@ -1114,7 +1135,7 @@ namespace AutoType.Classes
 				}
 
 				// если нет папки под сохранение, то создаём
-				string saveFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/AutoType/Saves/" + SaveName;
+				string saveFolder = directoryPath + SaveName;
 				// если уже есть папка с таким названием сохранения, то она будет перезаписана
 				if (Directory.Exists(saveFolder))
 				{

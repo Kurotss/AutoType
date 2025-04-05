@@ -34,104 +34,109 @@
                 <RowDefinition/>
                 <RowDefinition Height="50"/>
             </Grid.RowDefinitions>
-            <StackPanel VerticalAlignment="Top" HorizontalAlignment="Left" Orientation="Horizontal" Margin="0 50 0 10">
-                <Button Content="Открыть сохранение" Width="120" Height="50" Command="{Binding OpenSaveCommand}"/>
-                <Button Content="Выбрать файл" Width="120" Height="50" Command="{Binding OpenFileCommand}"/>
-                <Button Content="Выбрать папку" Width="120" Height="50" Command="{Binding OpenFolderCommand}"/>
-                <Button Content="Сгенерировать" Width="120" Height="50" Command="{Binding EditFileCommand}"/>
-            </StackPanel>
+            <Viewbox Width="{Binding LeftScreenWidth}" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0 50 0 10">
+                <StackPanel Orientation="Horizontal" >
+                    <Button Content="Открыть сохранение" Width="120" Height="50" Command="{Binding OpenSaveCommand}"/>
+                    <Button Content="Выбрать файл" Width="120" Height="50" Command="{Binding OpenFileCommand}"/>
+                    <Button Content="Выбрать папку" Width="120" Height="50" Command="{Binding OpenFolderCommand}"/>
+                    <Button Content="Сгенерировать" Width="120" Height="50" Command="{Binding EditFileCommand}"/>
+                </StackPanel>
+            </Viewbox>
             <!--Режим рамки, настройки, сохранение-->
-            <StackPanel VerticalAlignment="Top" HorizontalAlignment="Right" Orientation="Horizontal" Margin="0 50 0 10">
-                <!--Настройки наложения-->
-                <Grid Name="gridSettings" VerticalAlignment="Top">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition/>
-                    </Grid.ColumnDefinitions>
-                    <Grid Name="gridConfig" Visibility="{Binding IsNotExistsConfiguration, Converter={StaticResource InvertBoolToVisibilityConverter}}">
+            <Viewbox Width="{Binding RightScreenWidth}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0 50 0 10">
+                <StackPanel  Orientation="Horizontal" >
+                    <!--Настройки наложения-->
+                    <Grid Name="gridSettings" VerticalAlignment="Top">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="Выбрана настройка:  " FontSize="20" VerticalAlignment="Center"/>
-                        <StackPanel Orientation="Horizontal" Grid.Column="1">
-                            <Button Content="&lt;" FontSize="20" BorderThickness="0" Background="Transparent" Margin="0 0 5 0" Height="40" Command="{Binding NavigateToPreviousConfigCommand}"/>
-                            <TextBlock Text="{Binding CurrentConfig.ConfigurationName}" FontSize="20" Foreground="Blue" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            <Button BorderThickness="0" Background="Transparent" VerticalAlignment="Center" Margin="10 0 0 0" Command="{Binding DeleteConfigCommand}">
-                                <Image Source="../Resources/delete.png" Width="20" Height="20" ToolTip="Удалить"/>
-                            </Button>
-                            <Button Content=">" FontSize="20" BorderThickness="0" Background="Transparent" Height="40" Command="{Binding NavigateToNextConfigCommand}" Margin="5 0 5 0"/>
-                        </StackPanel>
-                    </Grid>
-                    <TextBlock Name="txtWarning" Text="У вас отсутствуют настройки для наложения рамок!" FontSize="20" Foreground="Red" VerticalAlignment="Center"
-                               HorizontalAlignment="Center" Visibility="{Binding IsNotExistsConfiguration, Converter={StaticResource BoolToVisibilityConverter}}"/>
-                    <Button Content="Настроить" Grid.Column="1" Width="120" Height="50" Command="{Binding CreateConfigurationCommand}"/>
-                </Grid>
-                <!--Дополнительные настройки-->
-                <Expander Margin="10" VerticalAlignment="Top">
-                    <Expander.Header>
-                        <TextBlock Text="Доп. настройки" FontSize="20"/>
-                    </Expander.Header>
-                    <StackPanel>
-                        <!--Режим рамки-->
-                        <ComboBox SelectedValue="{Binding FrameMode}" SelectedValuePath="Tag" FontSize="15" VerticalContentAlignment="Center">
-                            <ComboBox.Items>
-                                <ComboBoxItem Content="Старая рамка" Tag="{x:Static classes:FrameMode.Old}"/>
-                                <ComboBoxItem Content="Новая рамка" Tag="{x:Static classes:FrameMode.New}"/>
-                            </ComboBox.Items>
-                        </ComboBox>
-                        <!--Префикс-->
-                        <TextBlock Text="Префикс" FontSize="15" />
-                        <TextBox Grid.Column="1" Text="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}" FontSize="15" HorizontalAlignment="Stretch"/>
-                        <!--Обрезка картинок-->
-                        <TextBlock Text="Параметры для обрезки" FontSize="15" Name="txtCropped"/>
-                        <Grid Name="gridCropped">
+                        <Grid Name="gridConfig" Visibility="{Binding IsNotExistsConfiguration, Converter={StaticResource InvertBoolToVisibilityConverter}}">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition/>
-                                <ColumnDefinition/>
+                                <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition/>
                             </Grid.ColumnDefinitions>
-                            <TextBox Width="80" Text="{Binding CroppedWidth, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToDoubleConverter}}" FontSize="15"/>
-                            <TextBlock Text="x" FontSize="15" Grid.Column="1"/>
-                            <TextBox Width="80" Text="{Binding CroppedHeight, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToDoubleConverter}}" FontSize="15" Grid.Column="2"/>
+                            <TextBlock Text="Выбрана настройка:  " FontSize="20" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Grid.Column="1">
+                                <Button Content="&lt;" FontSize="20" BorderThickness="0" Background="Transparent" Margin="0 0 5 0" Height="40" Command="{Binding NavigateToPreviousConfigCommand}"/>
+                                <TextBlock Text="{Binding CurrentConfig.ConfigurationName}" FontSize="20" Foreground="Blue" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <Button BorderThickness="0" Background="Transparent" VerticalAlignment="Center" Margin="10 0 0 0" Command="{Binding DeleteConfigCommand}">
+                                    <Image Source="../Resources/delete.png" Width="20" Height="20" ToolTip="Удалить"/>
+                                </Button>
+                                <Button Content=">" FontSize="20" BorderThickness="0" Background="Transparent" Height="40" Command="{Binding NavigateToNextConfigCommand}" Margin="5 0 5 0"/>
+                            </StackPanel>
                         </Grid>
-                    </StackPanel>
-                </Expander>
-                <!--Панель для сохранений-->
-                <Expander Margin="10" VerticalAlignment="Top" Width="200">
-                    <Expander.Header>
-                        <TextBlock Text="Сохранения" FontSize="20"/>
-                    </Expander.Header>
-                    <StackPanel>
-                        <!--Открыть сохранение-->
-                        <TextBlock Text="Открыть сохранение" FontSize="15" />
-                        <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                            <ListBox ItemsSource="{Binding SaveFolders}" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                        <TextBlock Name="txtWarning" Text="У вас отсутствуют настройки для наложения рамок!" FontSize="20" Foreground="Red" VerticalAlignment="Center"
+                               HorizontalAlignment="Center" Visibility="{Binding IsNotExistsConfiguration, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                        <Button Content="Настроить" Grid.Column="1" Width="120" Height="50" Command="{Binding CreateConfigurationCommand}"/>
+                    </Grid>
+                    <!--Дополнительные настройки-->
+                    <Expander Margin="10" VerticalAlignment="Top">
+                        <Expander.Header>
+                            <TextBlock Text="Доп. настройки" FontSize="20"/>
+                        </Expander.Header>
+                        <StackPanel>
+                            <!--Режим рамки-->
+                            <ComboBox SelectedValue="{Binding FrameMode}" SelectedValuePath="Tag" FontSize="15" VerticalContentAlignment="Center">
+                                <ComboBox.Items>
+                                    <ComboBoxItem Content="Старая рамка" Tag="{x:Static classes:FrameMode.Old}"/>
+                                    <ComboBoxItem Content="Новая рамка" Tag="{x:Static classes:FrameMode.New}"/>
+                                </ComboBox.Items>
+                            </ComboBox>
+                            <!--Префикс-->
+                            <TextBlock Text="Префикс" FontSize="15" />
+                            <TextBox Grid.Column="1" Text="{Binding Prefix, UpdateSourceTrigger=PropertyChanged}" FontSize="15" HorizontalAlignment="Stretch"/>
+                            <!--Обрезка картинок-->
+                            <TextBlock Text="Параметры для обрезки" FontSize="15" Name="txtCropped"/>
+                            <Grid Name="gridCropped">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Width="80" Text="{Binding CroppedWidth, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToDoubleConverter}}" FontSize="15"/>
+                                <TextBlock Text="x" FontSize="15" Grid.Column="1"/>
+                                <TextBox Width="80" Text="{Binding CroppedHeight, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource StringToDoubleConverter}}" FontSize="15" Grid.Column="2"/>
+                            </Grid>
+                        </StackPanel>
+                    </Expander>
+                    <!--Панель для сохранений-->
+                    <Expander Margin="10" VerticalAlignment="Top">
+                        <Expander.Header>
+                            <TextBlock Text="Сохранения" FontSize="20"/>
+                        </Expander.Header>
+                        <StackPanel Width="200">
+                            <!--Открыть сохранение-->
+                            <TextBlock Name="openSaveText" Text="Открыть сохранение" FontSize="15" />
+                            <TextBlock Name="notExistSaveText" Text="Отсутствуют сохранения" FontSize="15" Foreground="Red" Visibility="Collapsed"/>
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                                <ListBox ItemsSource="{Binding SaveFolders}" HorizontalAlignment="Stretch" VerticalAlignment="Center"
                                      BorderThickness="0">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Button Command="{Binding DataContext.OpenSaveCommand, RelativeSource={RelativeSource AncestorType=Grid}}" CommandParameter="{Binding FullPath}">
-                                            <TextBlock Text="{Binding FolderName}" FontSize="15"/>
-                                        </Button>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                                <ListBox.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Orientation="Horizontal" />
-                                    </ItemsPanelTemplate>
-                                </ListBox.ItemsPanel>
-                            </ListBox>
-                        </ScrollViewer>
-                        <!--Название сохранения-->
-                        <TextBlock Text="Название сохранения" FontSize="15" />
-                        <TextBox Text="{Binding SaveName, UpdateSourceTrigger=PropertyChanged}" FontSize="15" HorizontalAlignment="Stretch"/>
-                        <!--Создать сохранение-->
-                        <Button Content="Создать сохранение" HorizontalAlignment="Stretch" Height="40" Margin="0 10 0 0" Command="{Binding CreateSaveCommand}"/>
-                    </StackPanel>
-                </Expander>
-                <!--Сохранение готовых картинок-->
-                <Button Name="save" Content="Сохранить в папку" Width="120" Height="50" Command="{Binding SaveFileCommand}" VerticalAlignment="Top"/>
-            </StackPanel>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Command="{Binding DataContext.OpenSaveCommand, RelativeSource={RelativeSource AncestorType=Grid}}" CommandParameter="{Binding FullPath}">
+                                                <TextBlock Text="{Binding FolderName}" FontSize="15"/>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal" />
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                </ListBox>
+                            </ScrollViewer>
+                            <!--Название сохранения-->
+                            <TextBlock Text="Название сохранения" FontSize="15" />
+                            <TextBox Text="{Binding SaveName, UpdateSourceTrigger=PropertyChanged}" FontSize="15" HorizontalAlignment="Stretch"/>
+                            <!--Создать сохранение-->
+                            <Button Content="Создать сохранение" HorizontalAlignment="Stretch" Height="40" Margin="0 10 0 0" Command="{Binding CreateSaveCommand}"/>
+                        </StackPanel>
+                    </Expander>
+                    <!--Сохранение готовых картинок-->
+                    <Button Name="save" Content="Сохранить в папку" Width="120" Height="50" Command="{Binding SaveFileCommand}" VerticalAlignment="Top"/>
+                </StackPanel>
+            </Viewbox>
             <!--Список картинок-->
             <ListBox ItemsSource="{Binding Images}" Grid.Row="1" Grid.RowSpan="3" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <ListBox.ItemContainerStyle>
@@ -143,7 +148,7 @@
                         </Style.Triggers>
                     </Style>
                 </ListBox.ItemContainerStyle>
-                
+
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid Visibility="{Binding Source, Converter={StaticResource ObjectToVisibilityConverter}}">
@@ -213,6 +218,10 @@
                 <Setter TargetName="progressBar" Property="Visibility" Value="Visible"/>
                 <Setter TargetName="spProgressInfo" Property="Visibility" Value="Visible"/>
                 <Setter TargetName="txtProgressInfo" Property="Text" Value="Открытие сохранения"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding SaveFolders.Count}" Value="0">
+                <Setter TargetName="openSaveText" Property="Visibility" Value="Collapsed"/>
+                <Setter TargetName="notExistSaveText" Property="Visibility" Value="Visible"/>
             </DataTrigger>
         </DataTemplate.Triggers>
     </DataTemplate>

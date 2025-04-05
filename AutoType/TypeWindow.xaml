@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" WindowStartupLocation="CenterScreen" WindowState="Maximized"
-        Title="TypeWindow" Height="450" Width="800" Closing="Window_Closing"
+        Title="TypeWindow" Closing="Window_Closing"
         Icon="../Resources/icon.png">
 
     <Window.Resources>

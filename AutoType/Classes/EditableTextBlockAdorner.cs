@@ -31,11 +31,10 @@ namespace EditBlockTest
             _collection = new VisualCollection(this);
             _textBox = new TextBox();
             _textBlock = adornedElement;
-            Binding binding = new Binding("Text") {Source = adornedElement};
+            Binding binding = new("Text") {Source = adornedElement};
             _textBox.SetBinding(TextBox.TextProperty, binding);
             _textBox.AcceptsReturn = true;
             _textBox.MaxLength = adornedElement.MaxLength;
-            //_textBox.LostFocus += _textBox_LostFocus;
             _textBox.TextChanged += AutoSizeTextBox_TextChanged;
 			_textBox.Background = Brushes.Transparent;
             _textBox.Foreground = _textBlock.Fill;
@@ -43,34 +42,39 @@ namespace EditBlockTest
             _textBox.Background = Brushes.Transparent;
             _textBox.TextWrapping = _textBlock.TextWrapping;
             _textBox.FontFamily = _textBlock.FontFamily;
-            _textBox.MaxLines = 999;
+            _textBox.MaxLines = 9999;
             _collection.Add(_textBox);
         }
 
 		private void AutoSizeTextBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
-			var formattedText = new FormattedText(
-			_textBox.Text, // Текущий текст в TextBox
-			CultureInfo.CurrentCulture,
-			FlowDirection.LeftToRight,
-			new Typeface(_textBox.FontFamily, _textBox.FontStyle, _textBox.FontWeight, _textBox.FontStretch),
-			_textBox.FontSize,
-			_textBlock.Fill,
-			VisualTreeHelper.GetDpi(this).PixelsPerDip);
+		    if (sender is TextBox textBox)
+		    {
+		    	var textBlock = new TextBlock
+		    	{
+		    		Text = textBox.Text,
+		    		FontFamily = textBox.FontFamily,
+		    		FontSize = textBox.FontSize,
+		    		FontStyle = textBox.FontStyle,
+		    		FontWeight = textBox.FontWeight,
+		    		TextWrapping = TextWrapping.Wrap,
+		    		Width = textBox.ActualWidth - textBox.Padding.Left - textBox.Padding.Right
+		    	};
 
-			// Вычисляем новую высоту с учетом переноса строк и отступов
-			double newHeight = Math.Min(formattedText.Height + _textBox.Padding.Top + _textBox.Padding.Bottom, _textBox.MaxHeight);
-			_textBox.Height = Math.Max(newHeight, _textBox.MinHeight);
+		    	textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+		    	textBlock.Arrange(new Rect(new System.Windows.Point(0, 0), textBlock.DesiredSize));
+
+		    	double textHeight = textBlock.DesiredSize.Height;
+
+		    	double newHeight = Math.Min(
+		    		textHeight + textBox.Padding.Top + textBox.Padding.Bottom + textBox.BorderThickness.Top + textBox.BorderThickness.Bottom + 5,
+		    		textBox.MaxHeight
+		    	);
+		    	textBox.Height = Math.Max(newHeight, textBox.MinHeight);
+
+		    	textBox.InvalidateVisual();
+		    }
 		}
-
-	//void _textBox_LostFocus(object sender, RoutedEventArgs e)
-	//{
-	//    BindingExpression expression = _textBox.GetBindingExpression(TextBox.TextProperty);
-	//    if (null != expression)
-	//    {
-	//        expression.UpdateSource();
-	//    }
-	//}
 
 	    protected override Visual GetVisualChild(int index)
         {
@@ -87,20 +91,7 @@ namespace EditBlockTest
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-			var formattedText = new FormattedText(
-			_textBox.Text, // Текущий текст в TextBox
-			CultureInfo.CurrentCulture,
-			FlowDirection.LeftToRight,
-			new Typeface(_textBox.FontFamily, _textBox.FontStyle, _textBox.FontWeight, _textBox.FontStretch),
-			_textBox.FontSize,
-			_textBlock.Fill,
-			VisualTreeHelper.GetDpi(this).PixelsPerDip);
-
-			// Вычисляем новую высоту с учетом переноса строк и отступов
-			double newHeight = Math.Min(formattedText.Height + _textBox.Padding.Top + _textBox.Padding.Bottom, _textBox.MaxHeight);
-			//_textBox.Height = Math.Max(newHeight, _textBox.MinHeight);
-
-			_textBox.Arrange(new Rect(0, 0, _textBlock.DesiredSize.Width + 50, newHeight));
+			_textBox.Arrange(new Rect(0, 0, _textBlock.DesiredSize.Width + 50, _textBlock.DesiredSize.Height));
 			_textBox.Focus();
 			return finalSize;
 		}
@@ -108,28 +99,40 @@ namespace EditBlockTest
 
 		protected override void OnRender(DrawingContext drawingContext)
         {
-
-			var formattedText = new FormattedText(
-			_textBox.Text, // Текущий текст в TextBox
-			CultureInfo.CurrentCulture,
-			FlowDirection.LeftToRight,
-			new Typeface(_textBox.FontFamily, _textBox.FontStyle, _textBox.FontWeight, _textBox.FontStretch),
-			_textBox.FontSize,
-			_textBlock.Fill,
-			VisualTreeHelper.GetDpi(this).PixelsPerDip);
-
-			// Вычисляем новую высоту с учетом переноса строк и отступов
-			double newHeight = Math.Min(formattedText.Height + _textBox.Padding.Top + _textBox.Padding.Bottom, _textBox.MaxHeight);
-			//_textBox.Height = Math.Max(newHeight, _textBox.MinHeight);
-
 			drawingContext.DrawRectangle(Brushes.Transparent, new Pen
             {
                 Brush = Brushes.Transparent,
                 Thickness = 0,
-            }, new Rect(0, 0, _textBlock.DesiredSize.Width + 50, newHeight));
+            }, new Rect(0, 0, _textBlock.DesiredSize.Width + 50, _textBlock.DesiredSize.Height));
         }
 
-        public event RoutedEventHandler TextBoxLostFocus
+		private void DynamicTextBox_TextChanged(object sender, TextChangedEventArgs e)
+		{
+			if (sender is TextBox textBox)
+			{
+				// Создаем временный TextBlock для измерения текста
+				var textBlock = new TextBlock
+				{
+					Text = textBox.Text,
+					FontFamily = textBox.FontFamily,
+					FontSize = textBox.FontSize,
+					FontStyle = textBox.FontStyle,
+					FontWeight = textBox.FontWeight,
+					TextWrapping = TextWrapping.Wrap,
+					Width = textBox.ActualWidth - textBox.Padding.Left - textBox.Padding.Right
+				};
+
+				// Измеряем размер текста
+				textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+				double textHeight = textBlock.DesiredSize.Height;
+
+				// Вычисляем новую высоту TextBox
+				double newHeight = Math.Min(textHeight + textBox.Padding.Top + textBox.Padding.Bottom, textBox.MaxHeight);
+				textBox.Height = Math.Max(newHeight, textBox.MinHeight);
+			}
+		}
+
+		public event RoutedEventHandler TextBoxLostFocus
         {
             add
             {
