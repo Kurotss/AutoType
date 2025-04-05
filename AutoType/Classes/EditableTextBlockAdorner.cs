@@ -48,32 +48,29 @@ namespace EditBlockTest
 
 		private void AutoSizeTextBox_TextChanged(object sender, TextChangedEventArgs e)
 		{
-		    if (sender is TextBox textBox)
-		    {
-		    	var textBlock = new TextBlock
-		    	{
-		    		Text = textBox.Text,
-		    		FontFamily = textBox.FontFamily,
-		    		FontSize = textBox.FontSize,
-		    		FontStyle = textBox.FontStyle,
-		    		FontWeight = textBox.FontWeight,
-		    		TextWrapping = TextWrapping.Wrap,
-		    		Width = textBox.ActualWidth - textBox.Padding.Left - textBox.Padding.Right
-		    	};
+		   var textBlock = new TextBlock
+		   {
+		        Text = _textBox.Text,
+		        FontFamily = _textBox.FontFamily,
+		        FontSize = _textBox.FontSize,
+		        FontStyle = _textBox.FontStyle,
+		        FontWeight = _textBox.FontWeight,
+		        TextWrapping = TextWrapping.Wrap,
+		        Width = _textBox.ActualWidth - _textBox.Padding.Left - _textBox.Padding.Right
+		   };
 
-		    	textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-		    	textBlock.Arrange(new Rect(new System.Windows.Point(0, 0), textBlock.DesiredSize));
+		   textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+		   textBlock.Arrange(new Rect(new System.Windows.Point(0, 0), textBlock.DesiredSize));
 
-		    	double textHeight = textBlock.DesiredSize.Height;
+		   double textHeight = textBlock.DesiredSize.Height;
 
-		    	double newHeight = Math.Min(
-		    		textHeight + textBox.Padding.Top + textBox.Padding.Bottom + textBox.BorderThickness.Top + textBox.BorderThickness.Bottom + 5,
-		    		textBox.MaxHeight
-		    	);
-		    	textBox.Height = Math.Max(newHeight, textBox.MinHeight);
+		   double newHeight = Math.Min(
+		   	textHeight + _textBox.Padding.Top + _textBox.Padding.Bottom + _textBox.BorderThickness.Top
+                 + _textBox.BorderThickness.Bottom + 5, _textBox.MaxHeight
+		   );
+		   _textBox.Height = Math.Max(newHeight, _textBox.MinHeight);
 
-		    	textBox.InvalidateVisual();
-		    }
+		    _textBox.InvalidateVisual();
 		}
 
 	    protected override Visual GetVisualChild(int index)
@@ -91,46 +88,24 @@ namespace EditBlockTest
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-			_textBox.Arrange(new Rect(0, 0, _textBlock.DesiredSize.Width + 50, _textBlock.DesiredSize.Height));
+            // если не определена высота textbox (в первый раз запускаем), то берём высоту textblock
+            var height = double.IsNaN(_textBox.Height) ? _textBlock.DesiredSize.Height : _textBox.Height;
+			_textBox.Arrange(new Rect(0, 0, _textBlock.DesiredSize.Width + 50, height));
 			_textBox.Focus();
 			return finalSize;
 		}
 
 
 		protected override void OnRender(DrawingContext drawingContext)
-        {
+		{
+			// если не определена высота textbox (в первый раз запускаем), то берём высоту textblock
+			var height = double.IsNaN(_textBox.Height) ? _textBlock.DesiredSize.Height : _textBox.Height;
 			drawingContext.DrawRectangle(Brushes.Transparent, new Pen
             {
                 Brush = Brushes.Transparent,
                 Thickness = 0,
-            }, new Rect(0, 0, _textBlock.DesiredSize.Width + 50, _textBlock.DesiredSize.Height));
+            }, new Rect(0, 0, _textBlock.DesiredSize.Width + 50, height));
         }
-
-		private void DynamicTextBox_TextChanged(object sender, TextChangedEventArgs e)
-		{
-			if (sender is TextBox textBox)
-			{
-				// Создаем временный TextBlock для измерения текста
-				var textBlock = new TextBlock
-				{
-					Text = textBox.Text,
-					FontFamily = textBox.FontFamily,
-					FontSize = textBox.FontSize,
-					FontStyle = textBox.FontStyle,
-					FontWeight = textBox.FontWeight,
-					TextWrapping = TextWrapping.Wrap,
-					Width = textBox.ActualWidth - textBox.Padding.Left - textBox.Padding.Right
-				};
-
-				// Измеряем размер текста
-				textBlock.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-				double textHeight = textBlock.DesiredSize.Height;
-
-				// Вычисляем новую высоту TextBox
-				double newHeight = Math.Min(textHeight + textBox.Padding.Top + textBox.Padding.Bottom, textBox.MaxHeight);
-				textBox.Height = Math.Max(newHeight, textBox.MinHeight);
-			}
-		}
 
 		public event RoutedEventHandler TextBoxLostFocus
         {
