@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using AutoType.Classes;
-using System.Drawing;
 using Size = System.Windows.Size;
 using System;
 using Brushes = System.Windows.Media.Brushes;
