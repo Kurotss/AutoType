@@ -61,14 +61,5 @@
         <classes:OutlinedTextBox x:Name="txtNote" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="19 10.5 0 0"
                               Fill="White" StrokeThickness="1.7" FontSize="22.8pt" Stroke="#444257" StrokePosition="Outside"
                               FontFamily="../Resources/#Sekai Untitled medium" TextWrapping="Wrap" Visibility="Collapsed" Height="Auto"/>
-
-        <TextBlock Text="Нажмите esc, чтобы выйти из режима редактирования" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="40" FontWeight="Bold" Foreground="Red"
-                   Margin="0 0 0 -50" Visibility="{Binding ElementName=txtDescrNew, Path=IsInEditMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
-
-        <TextBlock Text="Нажмите esc, чтобы выйти из режима редактирования" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="40" FontWeight="Bold" Foreground="Red"
-                  Margin="0 0 0 -50" Visibility="{Binding ElementName=txtNameNew, Path=IsInEditMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
-        
-        <TextBlock Text="Нажмите esc, чтобы выйти из режима редактирования" HorizontalAlignment="Center" VerticalAlignment="Bottom" FontSize="40" FontWeight="Bold" Foreground="Red"
-                    Margin="0 0 0 -50" Visibility="{Binding ElementName=txtNote, Path=IsInEditMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
     </Grid>
 </UserControl>

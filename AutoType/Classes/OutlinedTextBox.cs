@@ -1,5 +1,7 @@
 ﻿using EditBlockTest;
+using System;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -19,6 +21,11 @@ namespace AutoType.Classes
 				SetValue(IsInEditModeProperty, value);
 			}
 		}
+
+		/// <summary>
+		/// Делегат для действий при выходе из режима редактирования
+		/// </summary>
+		public Action UpdateEditModeActions;
 
 		private EditableTextBlockAdorner _adorner;
 
@@ -71,12 +78,11 @@ namespace AutoType.Classes
 
 					//Update the textblock's text binding.
 					BindingExpression expression = textBlock.GetBindingExpression(TextProperty);
-					if (null != expression)
-					{
-						expression.UpdateTarget();
-					}
+					expression?.UpdateTarget();
 					textBlock.Opacity = 1;
 				}
+
+				textBlock.UpdateEditModeActions?.Invoke();
 			}
 		}
 
@@ -109,7 +115,7 @@ namespace AutoType.Classes
 		/// release the edit mode when user presses escape.
 		/// </summary>
 		/// <param name="sender">The sender.</param>
-		/// <param name="e">The <see cref="System.Windows.Input.KeyEventArgs"/> instance containing the event data.</param>
+		/// <param name="e">The <see cref="KeyEventArgs"/> instance containing the event data.</param>
 		private void TextBoxKeyUp(object sender, KeyEventArgs e)
 		{
 			if (e.Key == Key.Escape)

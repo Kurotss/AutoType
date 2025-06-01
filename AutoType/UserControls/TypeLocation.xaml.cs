@@ -42,6 +42,7 @@ namespace AutoType.UserControls
 				txtNote.Visibility = Visibility.Visible;
 				txtNote.Text = note;
 				txtNote.Width = (Width - 200) / config.Scale; // устанавливаем ширину примечание, чтобы не заползало на меню
+				txtNote.Height = Height; // устанавливаем высоту примечания размером со скрин
 				txtNote.LayoutTransform = new ScaleTransform(config.Scale, config.Scale, 0, 0);
 			}
 

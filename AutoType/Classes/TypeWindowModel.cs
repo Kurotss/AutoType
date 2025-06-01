@@ -46,7 +46,7 @@ namespace AutoType.Classes
 				string saveFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/AutoType/Saves/" + SaveName + '/';
 				if (Directory.Exists(saveFolder))
 				{
-					var folders = Directory.GetDirectories(saveFolder).ToList();
+					var folders = Directory.GetDirectories(saveFolder).ToList().OrderBy(x => File.GetCreationTime(x));
 					foreach (var folder in folders)
 						SaveFolders.Add(new SaveFolder(folder, Path.GetFileName(folder), File.GetCreationTime(folder)));
 
@@ -405,7 +405,7 @@ namespace AutoType.Classes
 		/// <summary>
 		/// Ширина экрана под первый стек
 		/// </summary>
-		public static double LeftScreenWidth => SystemParameters.PrimaryScreenWidth / 6 * 1.8;
+		public static double LeftScreenWidth => SystemParameters.PrimaryScreenWidth / 6 * 1.5;
 
 		/// <summary>
 		/// Ширина экрана под второй стек

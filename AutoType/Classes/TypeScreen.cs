@@ -200,9 +200,8 @@ namespace AutoType.Classes
 				(UserControl.FindName("screen") as Image).Source = CroppedImage;
 			}
 
-
 			var image = Type == FileTypes.None ?
-								new System.Windows.Controls.Image()
+								new Image()
 								{
 									Source = CroppedImage,
 									Width = CroppedImage.Width,

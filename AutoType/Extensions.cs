@@ -1,15 +1,14 @@
 ﻿using System;
-using System.IO;
-using System.Windows.Media;
-using System.Windows;
-using System.Windows.Media.Imaging;
-using System.Windows.Controls;
 using System.Drawing.Imaging;
-using Bitmap = System.Drawing.Bitmap;
-using AutoType.Classes;
-using AutoType.UserControls;
+using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Xaml;
-using System.Collections.ObjectModel;
+using System.Xml.Linq;
+using Bitmap = System.Drawing.Bitmap;
 
 namespace AutoType
 {
@@ -210,6 +209,63 @@ namespace AutoType
 		{
 			using var stream = new MemoryStream(System.Text.Encoding.UTF8.GetBytes(xaml));
 			return XamlServices.Load(stream);
+		}
+
+		/// <summary>
+		/// Сериализация binding для записи в файл
+		/// </summary>
+		/// <param name="binding"></param>
+		/// <returns></returns>
+		public static XDocument ToXml(this Binding binding)
+		{
+			var xdoc = new XDocument(
+				new XElement(nameof(Binding),
+					new XElement("Path", binding.Path?.Path),
+					new XElement("ElementName", binding.ElementName),
+					new XElement("Source", binding.Source?.ToString()),
+					new XElement("Mode", (int)binding.Mode),
+					new XElement("UpdateSourceTrigger", (int)binding.UpdateSourceTrigger),
+					new XElement("ConverterTypeName", binding.Converter?.GetType().AssemblyQualifiedName)
+				)
+			);
+			return xdoc;
+		}
+
+		/// <summary>
+		/// Десериализация binding из xml
+		/// </summary>
+		/// <param name="xml"></param>
+		/// <returns></returns>
+		public static Binding FromXml(this string xml)
+		{
+			XDocument xdoc = XDocument.Load(xml);
+			var path = xdoc.Root.Element("Path")?.ToString();
+			var elementName = xdoc.Root.Element("ElementName")?.ToString();
+			var source = xdoc.Root.Element("Source")?.ToString();
+			var mode = (BindingMode)int.Parse(xdoc.Root.Element("Mode")?.Value);
+			var updateSourceTrigger = (UpdateSourceTrigger)int.Parse(xdoc.Root.Element("UpdateSourceTrigger")?.Value);
+			var converterTypeName = xdoc.Root.Element("ConverterTypeName")?.ToString();
+
+			var binding = new Binding
+			{
+				Path = !string.IsNullOrEmpty(path) ? new PropertyPath(path) : null,
+				ElementName = elementName,
+				Source = !string.IsNullOrEmpty(source) ? new Uri(source, UriKind.RelativeOrAbsolute) : null,
+				Mode = mode,
+				UpdateSourceTrigger = updateSourceTrigger
+			};
+
+			if (!string.IsNullOrEmpty(converterTypeName))
+			{
+				// Создаем экземпляр конвертера по имени типа
+				var converterType = Type.GetType(converterTypeName);
+				if (converterType != null && typeof(IValueConverter).IsAssignableFrom(converterType))
+				{
+					binding.Converter = (IValueConverter)Activator.CreateInstance(converterType);
+				}
+			}
+
+			return binding;
 		}
 	}
 }

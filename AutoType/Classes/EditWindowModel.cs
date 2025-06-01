@@ -17,8 +17,8 @@ namespace AutoType.Classes
 			var gridLeftPlace = UserControl.GetControlWithMode(Definitions.GRID_LEFT_PLACE) as Grid;
 			var txtTube = UserControl.GetControlWithMode(Definitions.TXT_TUBE) as TextBox;
 
-			IsLeftPlace = gridLeftPlace.Visibility == Visibility.Visible;
-			IsComplexLeftPlace = txtTube.Visibility == Visibility.Visible;
+			IsLeftPlace = gridLeftPlace?.Visibility == Visibility.Visible;
+			IsComplexLeftPlace = txtTube?.Visibility == Visibility.Visible;
 		}
 
 		#region Properties
